@@ -6,4 +6,4 @@ const athenaeumSchema = new Schema({
   courses: [{ type: Schema.Types.ObjectId, ref: "Course", required: true }],
 });
 
-module.exports = mongoose.model("Authenaeum", athenaeumSchema);
+module.exports = mongoose.model("Athenaeum", athenaeumSchema);
