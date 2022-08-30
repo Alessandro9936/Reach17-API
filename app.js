@@ -5,12 +5,13 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const cors = require("cors");
 const createError = require("http-errors");
+const multer = require("multer")();
 
 // Initiate app with express
 const app = express();
 app.listen(process.env.PORT || 3000);
 
-// Import DB
+// Import and connect DB
 const connectDB = require("./configs/db.config");
 connectDB();
 
@@ -24,31 +25,38 @@ const athenaeumRoutes = require("./routes/athenaeum");
 
 // Initiate App Middlewares
 
+// Parses incoming requests
+app.use(multer.any());
+app.use(express.json());
+
 // Log the request
 app.use(morgan("dev"));
 
 // Determine which domain can access the website
 app.use(cors());
 
-// Parses incoming JSON requests
-app.use(express.json());
-
 // Middleware for cookies
 app.use(cookieParser());
+// ---------------------
 
 // Initiate Routes
 app.use("/api/v1/goals", goalRoutes);
 app.use("/api/v1/courses", courseRoutes);
 app.use("/api/v1/athenaeums", athenaeumRoutes);
+//
 
-// Initiate middlewares
+// Initiate middlewares (auth, pass)
 
+// ---------------------
+
+// Error handler
 app.use((req, res, next) => {
   next(createError(404));
 });
 
-// Error Handler
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
   console.log(err);
 });
+
+// ---------------------
