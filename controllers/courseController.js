@@ -36,7 +36,7 @@ exports.course_create_post = [
     const courseGoals = await Goal.find({ name: req.body.goals }).select("_id");
 
     // Retrieve reference to athenaeums where course is held
-    const courserAthenaeums = await Athenaeum.find({
+    const coursesAthenaeums = await Athenaeum.find({
       name: req.body.athenaeums,
     }).select("_id");
 
@@ -44,8 +44,17 @@ exports.course_create_post = [
       name: req.body.name,
       description: req.body.description,
       goals: courseGoals,
-      athenaeums: courserAthenaeums,
+      athenaeums: coursesAthenaeums,
     });
+
+    // If course has goals find and update these adding course id to courses array
+    if (courseGoals.length > 0) {
+      courseGoals.map(async (goal) => {
+        await Goal.findByIdAndUpdate(goal._id, {
+          $push: { courses: course },
+        });
+      });
+    }
 
     // Validation passed, store new course in database and send it back
     course.save((err) => {
