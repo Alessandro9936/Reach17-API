@@ -1,5 +1,6 @@
 const { body, validationResult } = require("express-validator");
 
+const Athenaeum = require("../models/athenaeumModel");
 const Course = require("../models/courseModel");
 const Goal = require("../models/goalModel");
 
@@ -31,14 +32,19 @@ exports.course_create_post = [
       return;
     }
 
-    // Retrieve reference to course's goals to store them in new course schema with other values
+    // Retrieve reference to course's goals
     const courseGoals = await Goal.find({ name: req.body.goals }).select("_id");
+
+    // Retrieve reference to athenaeums where course is held
+    const courserAthenaeums = await Athenaeum.find({
+      name: req.body.athenaeums,
+    }).select("_id");
 
     const course = new Course({
       name: req.body.name,
       description: req.body.description,
       goals: courseGoals,
-      athenaeum: req.body.athenaeums,
+      athenaeums: courserAthenaeums,
     });
 
     // Validation passed, store new course in database and send it back
