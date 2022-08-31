@@ -76,7 +76,32 @@ exports.course_create_post = [
   },
 ];
 
-exports.course_update_post = (req, res, next) => {};
+exports.course_update_post = async (req, res, next) => {
+  // Store for clarity modified input fields
+  const updatedName = req.body.name;
+  const updateDescription = req.body.description;
+  const updatedCourses = await Course.find({ name: req.body.courses }).select(
+    "_id"
+  );
+  const updatedAthenaeums = await Athenaeum.find({
+    name: req.body.athenaeums,
+  }).select("_id");
+
+  Course.findByIdAndUpdate(
+    req.params.id,
+    {
+      name: updatedName,
+      description: updateDescription,
+      courses: updatedCourses,
+      athenaeums: updatedAthenaeums,
+    },
+    { new: true }, // return update goal instead of original
+    (err, course) => {
+      if (err) return next(err);
+      res.json({ course });
+    }
+  );
+};
 
 exports.course_delete_post = (req, res, next) => {};
 
