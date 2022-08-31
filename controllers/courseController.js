@@ -56,6 +56,15 @@ exports.course_create_post = [
       });
     }
 
+    // If course is held in athenaeums find and update these adding course id to courses array
+    if (coursesAthenaeums.length > 0) {
+      coursesAthenaeums.map(async (athenaeum) => {
+        await Athenaeum.findByIdAndUpdate(athenaeum._id, {
+          $push: { courses: course },
+        });
+      });
+    }
+
     // Validation passed, store new course in database and send it back
     course.save((err) => {
       if (err) return next(err);
