@@ -53,7 +53,28 @@ exports.goal_create_post = [
   },
 ];
 
-exports.goal_update_post = (req, res, next) => {};
+exports.goal_update_post = async (req, res, next) => {
+  // Store for clarity modified input fields
+  const updatedName = req.body.name;
+  const updateDescription = req.body.description;
+  const updatedCourses = await Course.find({ name: req.body.courses }).select(
+    "_id"
+  );
+
+  Goal.findByIdAndUpdate(
+    req.params.id,
+    {
+      name: updatedName,
+      description: updateDescription,
+      courses: updatedCourses,
+    },
+    { new: true }, // return update goal instead of original
+    (err, goal) => {
+      if (err) return next(err);
+      res.json({ goal });
+    }
+  );
+};
 
 exports.goal_delete_post = (req, res, next) => {};
 
