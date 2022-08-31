@@ -5,7 +5,7 @@ const courseSchema = new Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   goals: [{ type: Schema.Types.ObjectId, ref: "Goal" }],
-  athenaeum: [{ type: Schema.Types.ObjectId, ref: "Athenaeum" }],
+  athenaeums: [{ type: Schema.Types.ObjectId, ref: "Athenaeum" }],
 });
 
 module.exports = mongoose.model("Course", courseSchema);
