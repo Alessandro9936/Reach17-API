@@ -38,6 +38,15 @@ exports.athenaeum_create_post = [
       courses: coursesInAthenaeum,
     });
 
+    // If athenaeum hold courses find and update these adding atheneaum id to atheneaums array
+    if (coursesInAthenaeum.length > 0) {
+      coursesInAthenaeum.map(async (course) => {
+        await Course.findByIdAndUpdate(course._id, {
+          $push: { athenaeums: athenaeum },
+        });
+      });
+    }
+
     // Validation passed, store new course in database and send it back
     athenaeum.save((err) => {
       if (err) return next(err);
