@@ -3,7 +3,10 @@ const { body, validationResult } = require("express-validator");
 const Goal = require("../models/goalModel");
 const Course = require("../models/courseModel");
 
-exports.goals_list = (req, res, next) => {};
+exports.goals_list = async (req, res, next) => {
+  const goals = await Goal.find();
+  res.json({ goals });
+};
 
 exports.goal_create_post = [
   // First / second middleware function --> Validate form input values

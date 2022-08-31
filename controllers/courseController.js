@@ -4,7 +4,10 @@ const Athenaeum = require("../models/athenaeumModel");
 const Course = require("../models/courseModel");
 const Goal = require("../models/goalModel");
 
-exports.courses_list = (req, res, next) => {};
+exports.courses_list = async (req, res, next) => {
+  const courses = await Course.find();
+  res.json({ courses });
+};
 
 exports.course_create_post = [
   // First / second middleware function --> Validate form input values

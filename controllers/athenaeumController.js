@@ -3,7 +3,10 @@ const { body, validationResult } = require("express-validator");
 const Athenaeum = require("../models/athenaeumModel");
 const Course = require("../models/courseModel");
 
-exports.athenaeums_list = (req, res, next) => {};
+exports.athenaeums_list = async (req, res, next) => {
+  const athenaeums = await Athenaeum.find();
+  res.json({ athenaeums });
+};
 
 exports.athenaeum_create_post = [
   // First / second middleware function --> Validate form input values
