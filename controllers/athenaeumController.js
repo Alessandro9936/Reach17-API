@@ -43,10 +43,8 @@ exports.athenaeum_create_post = [
 
     // If athenaeum hold courses find and update these adding atheneaum id to atheneaums array
     if (coursesInAthenaeum.length > 0) {
-      coursesInAthenaeum.map(async (course) => {
-        await Course.findByIdAndUpdate(course._id, {
-          $push: { athenaeums: athenaeum },
-        });
+      coursesInAthenaeum.map((course) => {
+        Course.handleRelations("add", "athenaeum", course._id, athenaeum);
       });
     }
 

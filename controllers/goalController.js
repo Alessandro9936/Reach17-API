@@ -45,6 +45,13 @@ exports.goal_create_post = [
       courses: coursesInGoal,
     });
 
+    // If courses are selected while creating new goal find and update these adding course id to goals array
+    if (coursesInGoal.length > 0) {
+      coursesInGoal.map((course) => {
+        Course.handleRelations("add", "goal", course._id, goal);
+      });
+    }
+
     // Validation passed, store new course in database and send it back
     goal.save((err) => {
       if (err) return next(err);
