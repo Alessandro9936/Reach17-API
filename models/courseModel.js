@@ -33,6 +33,74 @@ courseSchema.static(
   }
 );
 
-module.exports = mongoose.model("Course", courseSchema);
+/**
+ * Loop through existing courses to add or remove goal depending if there is a relation or not after changes in goal.courses
+ * @param {object} oldGoal goal before any update
+ * @param {object} newGoal goal after updates
+ */
 
-// remove , add
+courseSchema.static("updateGoals", async function (oldGoal, newGoal) {
+  try {
+    const courses = await this.find({});
+
+    courses.forEach(async (course) => {
+      if (
+        oldGoal.courses.includes(course._id) &&
+        !newGoal.courses.includes(course._id)
+      ) {
+        await this.findByIdAndUpdate(course._id, {
+          $pull: { goals: newGoal._id },
+        });
+      }
+
+      if (
+        !oldGoal.courses.includes(course._id) &&
+        newGoal.courses.includes(course._id)
+      ) {
+        await this.findByIdAndUpdate(course._id, {
+          $push: { goals: newGoal._id },
+        });
+      }
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+/**
+ * Loop through existing courses to add or remove goal depending if there is a relation or not after changes in athenaeum.courses
+ * @param {object} oldGoal goal before any update
+ * @param {object} newGoal goal after updates
+ */
+courseSchema.static(
+  "updateAtheaneums",
+  async function (oldAthenaeum, newAthenaeum) {
+    try {
+      const courses = await this.find({});
+
+      courses.forEach(async (course) => {
+        if (
+          oldAthenaeum.courses.includes(course._id) &&
+          !newAthenaeum.courses.includes(course._id)
+        ) {
+          await this.findByIdAndUpdate(course._id, {
+            $pull: { athenaeums: newAthenaeum._id },
+          });
+        }
+
+        if (
+          !oldAthenaeum.courses.includes(course._id) &&
+          newAthenaeum.courses.includes(course._id)
+        ) {
+          await this.findByIdAndUpdate(course._id, {
+            $push: { athenaeums: newAthenaeum._id },
+          });
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+
+module.exports = mongoose.model("Course", courseSchema);

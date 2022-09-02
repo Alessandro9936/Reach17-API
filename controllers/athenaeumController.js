@@ -56,26 +56,50 @@ exports.athenaeum_create_post = [
   },
 ];
 
-exports.athenaeum_update_post = async (req, res, next) => {
-  // Store for clarity modified input fields
-  const updatedName = req.body.name;
-  const updatedCourses = await Course.find({ name: req.body.courses }).select(
-    "_id"
-  );
+exports.athenaeum_update_post = [
+  body("name").notEmpty().withMessage("Name field must not be empty"),
 
-  Athenaeum.findByIdAndUpdate(
-    req.params.id,
-    {
-      name: updatedName,
-      courses: updatedCourses,
-    },
-    { new: true }, // return update goal instead of original
-    (err, athenaeum) => {
-      if (err) return next(err);
-      res.json({ athenaeum });
+  // Third middleware function --> Handle errors from validation or update athenaeums and relations
+  async (req, res, next) => {
+    const errors = validationResult(req);
+
+    // If validation result got errors return them
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
     }
-  );
-};
+
+    // Get athenaeum before any update
+    const oldAthenaeum = await Athenaeum.findById(req.params.id);
+
+    // Store for clarity modified input fields
+    const updatedName = req.body.name;
+    const updatedCourses = await Course.find({ name: req.body.courses }).select(
+      "_id"
+    );
+
+    // Update athenaeum in database with new values
+    Athenaeum.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: updatedName,
+        courses: updatedCourses,
+      },
+      { new: true }, // return update goal instead of original
+      (err, newAthenaeum) => {
+        if (err) return next(err);
+
+        /* When updating an athenaeum user can also add or remove courses that are held in it.
+
+          With the updateAtheaneums static method on course model we can add or remove from it the atheneaum reference
+          depending if there is a relation or not*/
+        Course.updateAtheaneums(oldAthenaeum, newAthenaeum);
+
+        res.json({ newAthenaeum });
+      }
+    );
+  },
+];
 
 exports.athenaeum_delete_post = (req, res, next) => {};
 
