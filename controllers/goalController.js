@@ -110,6 +110,15 @@ exports.goal_update_post = [
   },
 ];
 
-exports.goal_delete_post = (req, res, next) => {};
+exports.goal_delete_post = (req, res, next) => {
+  Goal.findByIdAndDelete(req.params.id, (err, goal) => {
+    if (err) return next(err);
+
+    //Remove all reference to course in goal.courses & athenaeum.courses
+    goal.courses.map((course) => {
+      Course.handleRelations("remove", "goal", course._id, goal._id);
+    });
+  });
+};
 
 exports.goal_detail = (req, res, next) => {};

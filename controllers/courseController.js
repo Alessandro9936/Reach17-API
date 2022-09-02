@@ -131,6 +131,20 @@ exports.course_update_post = [
   },
 ];
 
-exports.course_delete_post = (req, res, next) => {};
+exports.course_delete_post = (req, res, next) => {
+  Course.findByIdAndDelete(req.params.id, (err, course) => {
+    if (err) return next(err);
+
+    //Remove all reference to course in goal.courses & athenaeum.courses
+    course.athenaeums.map((athenaeum) => {
+      Athenaeum.handleRelations("remove", athenaeum._id, course._id);
+    });
+    course.goals.map((goal) => {
+      Goal.handleRelations("remove", goal._id, course._id);
+    });
+  });
+
+  res.redirect("/");
+};
 
 exports.course_detail = (req, res, next) => {};
