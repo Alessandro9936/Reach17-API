@@ -52,15 +52,15 @@ exports.course_create_post = [
 
     // If course has goals find and update these adding course id to courses array
     if (courseGoals.length > 0) {
-      courseGoals.map((goal) => {
-        Goal.handleRelations("add", goal._id, course);
+      courseGoals.forEach((goal) => {
+        Goal.addCourseRelation(goal._id, course);
       });
     }
 
     // If course is held in athenaeums find and update these adding course id to courses array
     if (coursesAthenaeums.length > 0) {
-      coursesAthenaeums.map((athenaeum) => {
-        Athenaeum.handleRelations("add", athenaeum._id, course);
+      coursesAthenaeums.forEach((athenaeum) => {
+        Athenaeum.addCourseRelation(athenaeum._id, course);
       });
     }
 

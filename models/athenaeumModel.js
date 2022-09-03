@@ -7,18 +7,16 @@ const athenaeumSchema = new Schema({
 });
 
 athenaeumSchema.static(
-  "handleRelations",
-  async function (action, elementId, course) {
-    if (action === "add") {
-      await this.findByIdAndUpdate(elementId, {
-        $push: { courses: course },
-      });
-    }
-    if (action === "remove") {
-      await this.findByIdAndUpdate(elementId, {
-        $pull: { courses: course },
-      });
-    }
+  "addCourseRelation",
+  async function (athenaeumID, course) {
+    await this.findByIdAndUpdate(athenaeumID, { $push: { courses: course } });
+  }
+);
+
+athenaeumSchema.static(
+  "removeCourseRelation",
+  async function (athenaeumID, course) {
+    await this.findByIdAndUpdate(athenaeumID, { $pull: { courses: course } });
   }
 );
 

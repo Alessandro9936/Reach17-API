@@ -8,25 +8,31 @@ const courseSchema = new Schema({
   athenaeums: [{ type: Schema.Types.ObjectId, ref: "Athenaeum" }],
 });
 
+// Similar to addCourseRelation on other models, this one also accept another parameter (elementType) which specifiecs whether the element to push is an athenaeum or a goal. This also allow to define in which array the element must be pushed
 courseSchema.static(
-  "handleRelations",
-  async function (action, elementType, courseId, element) {
-    if (action === "add" && elementType === "goal") {
-      await this.findByIdAndUpdate(courseId, {
+  "addRelations",
+  async function (elementType, courseID, element) {
+    if (elementType === "goal") {
+      await this.findByIdAndUpdate(courseID, {
         $push: { goals: element },
       });
-    } else if (action === "add" && elementType === "athenaeum") {
-      await this.findByIdAndUpdate(courseId, {
+    } else if (elementType === "athenaeum") {
+      await this.findByIdAndUpdate(courseID, {
         $push: { athenaeums: element },
       });
     }
+  }
+);
 
-    if (action === "remove" && elementType === "goal") {
-      await this.findByIdAndUpdate(courseId, {
+courseSchema.static(
+  "removeRelations",
+  async function (elementType, courseID, element) {
+    if (elementType === "goal") {
+      await this.findByIdAndUpdate(courseID, {
         $pull: { goals: element },
       });
-    } else if (action === "remove" && elementType === "athenaeum") {
-      await this.findByIdAndUpdate(courseId, {
+    } else if (elementType === "athenaeum") {
+      await this.findByIdAndUpdate(courseID, {
         $pull: { athenaeums: element },
       });
     }

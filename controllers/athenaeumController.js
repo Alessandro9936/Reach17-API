@@ -31,7 +31,7 @@ exports.athenaeum_create_post = [
       return;
     }
 
-    // Retrieve reference to course's goals to store them in new course schema with other values
+    // Retrieve id of courses that are hold in athenaeum in order to store them in the new athenaeum's schema
     const coursesInAthenaeum = await Course.find({
       name: req.body.courses,
     }).select("_id");
@@ -41,10 +41,10 @@ exports.athenaeum_create_post = [
       courses: coursesInAthenaeum,
     });
 
-    // If athenaeum hold courses find and update these adding atheneaum id to atheneaums array
+    // If athenaeum hold courses find and update these adding atheneaum reference to course.athenaeums array
     if (coursesInAthenaeum.length > 0) {
       coursesInAthenaeum.map((course) => {
-        Course.handleRelations("add", "athenaeum", course._id, athenaeum);
+        Course.addRelations("athenaeum", course._id, athenaeum);
       });
     }
 
@@ -59,7 +59,6 @@ exports.athenaeum_create_post = [
 exports.athenaeum_update_post = [
   body("name").notEmpty().withMessage("Name field must not be empty"),
 
-  // Third middleware function --> Handle errors from validation or update athenaeums and relations
   async (req, res, next) => {
     const errors = validationResult(req);
 
@@ -85,14 +84,13 @@ exports.athenaeum_update_post = [
         name: updatedName,
         courses: updatedCourses,
       },
-      { new: true }, // return update goal instead of original
+      { new: true }, // return updated goal instead of original
       (err, newAthenaeum) => {
         if (err) return next(err);
 
         /* When updating an athenaeum user can also add or remove courses that are held in it.
 
-          With the updateAtheaneums static method on course model we can add or remove from it the atheneaum reference
-          depending if there is a relation or not*/
+          With the updateAtheaneums static method on course model we can add or remove from it the atheneaum reference depending if there is a relation or not*/
         Course.updateAtheaneums(oldAthenaeum, newAthenaeum);
 
         res.json({ newAthenaeum });
@@ -107,7 +105,7 @@ exports.athenaeum_delete_post = (req, res, next) => {
 
     //Remove all reference to course in goal.courses & athenaeum.courses
     athenaeum.courses.map((course) => {
-      Course.handleRelations("remove", "athenaeum", course._id, athenaeum._id);
+      Course.removeRelations("athenaeum", course._id, athenaeum._id);
     });
   });
 };

@@ -7,21 +7,13 @@ const goalSchema = new Schema({
   courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 });
 
-goalSchema.static(
-  "handleRelations",
-  async function (action, elementId, course) {
-    if (action === "add") {
-      await this.findByIdAndUpdate(elementId, {
-        $push: { courses: course },
-      });
-    }
-    if (action === "remove") {
-      await this.findByIdAndUpdate(elementId, {
-        $pull: { courses: course },
-      });
-    }
-  }
-);
+goalSchema.static("addCourseRelation", async function (goalID, course) {
+  await this.findByIdAndUpdate(goalID, { $push: { courses: course } });
+});
+
+goalSchema.static("removeCourseRelation", async function (goalID, course) {
+  await this.findByIdAndUpdate(goalID, { $pull: { courses: course } });
+});
 
 /**
  * Loop through existing goals to add or remove course depending if there is a relation or not after changes

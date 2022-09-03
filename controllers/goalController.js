@@ -34,7 +34,7 @@ exports.goal_create_post = [
       return;
     }
 
-    // Retrieve reference to courses related to goal to store them in new goal schema with other values
+    // Retrieve id of courses that user wants to belong in goal in order to store them in the new goal's schema
     const coursesInGoal = await Course.find({ name: req.body.courses }).select(
       "_id"
     );
@@ -45,10 +45,10 @@ exports.goal_create_post = [
       courses: coursesInGoal,
     });
 
-    // If courses are selected while creating new goal find and update these adding course id to goals array
+    // If courses are selected while creating new goal find and update these adding course reference to course.goals array
     if (coursesInGoal.length > 0) {
       coursesInGoal.map((course) => {
-        Course.handleRelations("add", "goal", course._id, goal);
+        Course.addRelations("goal", course._id, goal);
       });
     }
 
@@ -66,7 +66,6 @@ exports.goal_update_post = [
     .notEmpty()
     .withMessage("Description field must not be empty"),
 
-  // Third middleware function --> Handle errors from validation or update goal and relations
   async (req, res, next) => {
     const errors = validationResult(req);
 
@@ -94,14 +93,13 @@ exports.goal_update_post = [
         description: updateDescription,
         courses: updatedCourses,
       },
-      { new: true }, // return update goal instead of original
+      { new: true }, // return updated goal instead of original
       (err, newGoal) => {
         if (err) return next(err);
 
         /* When updating a goal user can also add or remove courses that belong in it.
 
-          With the updateGoals static method on course model we can add or remove from it the goal reference
-          depending if there is a relation or not*/
+          With the updateGoals static method on course model we can add or remove from it the goal reference depending if there is a relation or not*/
         Course.updateGoals(oldGoal, newGoal);
 
         res.json({ newGoal });
@@ -116,7 +114,7 @@ exports.goal_delete_post = (req, res, next) => {
 
     //Remove all reference to course in goal.courses & athenaeum.courses
     goal.courses.map((course) => {
-      Course.handleRelations("remove", "goal", course._id, goal._id);
+      Course.removeRelations("goal", course._id, goal._id);
     });
   });
 };
