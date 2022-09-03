@@ -40,9 +40,9 @@ app.use(cookieParser());
 // ---------------------
 
 // Initiate Routes
-app.use("/api/v1/goals", goalRoutes);
-app.use("/api/v1/courses", courseRoutes);
-app.use("/api/v1/athenaeums", athenaeumRoutes);
+app.use("/goals", goalRoutes);
+app.use("/courses", courseRoutes);
+app.use("/athenaeums", athenaeumRoutes);
 //
 
 // Initiate middlewares (auth, pass)
