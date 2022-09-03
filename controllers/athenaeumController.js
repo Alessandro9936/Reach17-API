@@ -93,7 +93,7 @@ exports.athenaeum_update_post = [
           With the updateAtheaneums static method on course model we can add or remove from it the atheneaum reference depending if there is a relation or not*/
         Course.updateAtheaneums(oldAthenaeum, newAthenaeum);
 
-        res.json({ newAthenaeum });
+        res.redirect(newAthenaeum.url);
       }
     );
   },
@@ -110,4 +110,8 @@ exports.athenaeum_delete_post = (req, res, next) => {
   });
 };
 
-exports.athenaeum_detail = (req, res, next) => {};
+exports.athenaeum_detail = async (req, res, next) => {
+  const athenaeum = await Athenaeum.findById(req.params.id);
+
+  res.json({ athenaeum });
+};

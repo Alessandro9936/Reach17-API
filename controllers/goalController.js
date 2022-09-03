@@ -102,7 +102,7 @@ exports.goal_update_post = [
           With the updateGoals static method on course model we can add or remove from it the goal reference depending if there is a relation or not*/
         Course.updateGoals(oldGoal, newGoal);
 
-        res.json({ newGoal });
+        res.redirect(newGoal.url);
       }
     );
   },
@@ -119,4 +119,8 @@ exports.goal_delete_post = (req, res, next) => {
   });
 };
 
-exports.goal_detail = (req, res, next) => {};
+exports.goal_detail = async (req, res, next) => {
+  const goal = await Goal.findById(req.params.id);
+
+  res.json({ goal });
+};

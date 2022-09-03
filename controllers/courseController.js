@@ -122,7 +122,7 @@ exports.course_update_post = [
           Goal.updateCourses(oldCourse, newCourse);
           Athenaeum.updateCourses(oldCourse, newCourse);
 
-          res.json({ newCourse });
+          res.redirect(newCourse.url);
         }
       );
     } catch (err) {
@@ -147,4 +147,8 @@ exports.course_delete_post = (req, res, next) => {
   res.redirect("/");
 };
 
-exports.course_detail = (req, res, next) => {};
+exports.course_detail = async (req, res, next) => {
+  const course = await Course.findById(req.params.id);
+
+  res.json({ course });
+};
