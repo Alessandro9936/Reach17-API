@@ -50,4 +50,8 @@ goalSchema.static("updateCourses", async function (oldCourse, newCourse) {
   }
 });
 
+goalSchema.virtual("url").get(function () {
+  return "/goals/" + this._id;
+});
+
 module.exports = mongoose.model("Goal", goalSchema);

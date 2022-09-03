@@ -55,4 +55,8 @@ athenaeumSchema.static("updateCourses", async function (oldCourse, newCourse) {
   }
 });
 
+athenaeumSchema.virtual("url").get(function () {
+  return "/athenaeums/" + this._id;
+});
+
 module.exports = mongoose.model("Athenaeum", athenaeumSchema);

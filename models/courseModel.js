@@ -109,4 +109,8 @@ courseSchema.static(
   }
 );
 
+courseSchema.virtual("url").get(function () {
+  return "/courses/" + this._id;
+});
+
 module.exports = mongoose.model("Course", courseSchema);
