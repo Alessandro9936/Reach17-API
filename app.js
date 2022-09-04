@@ -4,8 +4,12 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const cors = require("cors");
-const createError = require("http-errors");
 const multer = require("multer")();
+
+const createHTTPError = require("http-errors");
+
+// Import middlewares
+const errorHandlerMiddleware = require("./middlewares/error-handler");
 
 // Initiate app with express
 const app = express();
@@ -14,8 +18,6 @@ app.listen(process.env.PORT || 3000);
 // Import and connect DB
 const connectDB = require("./configs/db.config");
 connectDB();
-
-// Import middlewares
 
 // Import Routes
 
@@ -49,14 +51,10 @@ app.use("/athenaeums", athenaeumRoutes);
 
 // ---------------------
 
-// Error handler
-app.use((req, res, next) => {
-  next(createError(404));
-});
-
+// Handle error if the routes not found or there's problem in DB connection
 app.use((err, req, res, next) => {
-  res.status(err.status || 500);
-  console.log(err);
+  next(createHTTPError(404, err));
 });
-
+// Error handler
+app.use(errorHandlerMiddleware);
 // ---------------------
