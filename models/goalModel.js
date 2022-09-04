@@ -1,18 +1,29 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const goalSchema = new Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
-});
+const goalSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
+  },
+  { timestamps: true }
+);
 
 goalSchema.static("addCourseRelation", async function (goalID, course) {
-  await this.findByIdAndUpdate(goalID, { $push: { courses: course } });
+  try {
+    await this.findByIdAndUpdate(goalID, { $push: { courses: course } });
+  } catch (err) {
+    throw err;
+  }
 });
 
 goalSchema.static("removeCourseRelation", async function (goalID, course) {
-  await this.findByIdAndUpdate(goalID, { $pull: { courses: course } });
+  try {
+    await this.findByIdAndUpdate(goalID, { $pull: { courses: course } });
+  } catch (err) {
+    throw err;
+  }
 });
 
 /**
@@ -46,7 +57,7 @@ goalSchema.static("updateCourses", async function (oldCourse, newCourse) {
       }
     });
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 });
 

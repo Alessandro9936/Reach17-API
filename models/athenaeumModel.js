@@ -1,22 +1,33 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const athenaeumSchema = new Schema({
-  name: { type: String, required: true },
-  courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
-});
+const athenaeumSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
+  },
+  { timestamps: true }
+);
 
 athenaeumSchema.static(
   "addCourseRelation",
   async function (athenaeumID, course) {
-    await this.findByIdAndUpdate(athenaeumID, { $push: { courses: course } });
+    try {
+      await this.findByIdAndUpdate(athenaeumID, { $push: { courses: course } });
+    } catch (err) {
+      throw err;
+    }
   }
 );
 
 athenaeumSchema.static(
   "removeCourseRelation",
   async function (athenaeumID, course) {
-    await this.findByIdAndUpdate(athenaeumID, { $pull: { courses: course } });
+    try {
+      await this.findByIdAndUpdate(athenaeumID, { $pull: { courses: course } });
+    } catch (err) {
+      throw err;
+    }
   }
 );
 
@@ -51,7 +62,7 @@ athenaeumSchema.static("updateCourses", async function (oldCourse, newCourse) {
       }
     });
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 });
 

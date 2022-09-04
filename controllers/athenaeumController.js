@@ -1,11 +1,14 @@
 const { body, validationResult } = require("express-validator");
-
 const Athenaeum = require("../models/athenaeumModel");
 const Course = require("../models/courseModel");
 
 exports.athenaeums_list = async (req, res, next) => {
-  const athenaeums = await Athenaeum.find();
-  res.json({ athenaeums });
+  try {
+    const athenaeums = await Athenaeum.find();
+    res.json({ athenaeums });
+  } catch (err) {
+    return next(err);
+  }
 };
 
 exports.athenaeum_create_post = [
@@ -22,37 +25,41 @@ exports.athenaeum_create_post = [
 
   // Third middleware function --> Handle errors from validation or save new course
   async (req, res, next) => {
-    // Check if validation returned errors
-    const errors = validationResult(req);
+    try {
+      // Check if validation returned errors
+      const errors = validationResult(req);
 
-    // If validation result got errors return them
-    if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
-      return;
-    }
+      // If validation result got errors return them
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+        return;
+      }
 
-    // Retrieve id of courses that are hold in athenaeum in order to store them in the new athenaeum's schema
-    const coursesInAthenaeum = await Course.find({
-      name: req.body.courses,
-    }).select("_id");
+      // Retrieve id of courses that are hold in athenaeum in order to store them in the new athenaeum's schema
+      const coursesInAthenaeum = await Course.find({
+        name: req.body.courses,
+      }).select("_id");
 
-    const athenaeum = new Athenaeum({
-      name: req.body.name,
-      courses: coursesInAthenaeum,
-    });
-
-    // If athenaeum hold courses find and update these adding atheneaum reference to course.athenaeums array
-    if (coursesInAthenaeum.length > 0) {
-      coursesInAthenaeum.map((course) => {
-        Course.addRelations("athenaeum", course._id, athenaeum);
+      const athenaeum = new Athenaeum({
+        name: req.body.name,
+        courses: coursesInAthenaeum,
       });
-    }
 
-    // Validation passed, store new course in database and send it back
-    athenaeum.save((err) => {
-      if (err) return next(err);
-      res.json({ athenaeum });
-    });
+      // If athenaeum hold courses find and update these adding atheneaum reference to course.athenaeums array
+      if (coursesInAthenaeum.length > 0) {
+        coursesInAthenaeum.map((course) => {
+          Course.addRelations("athenaeum", course._id, athenaeum);
+        });
+      }
+
+      // Validation passed, store new course in database and send it back
+      athenaeum.save((err) => {
+        if (err) return next(err);
+        res.json({ athenaeum });
+      });
+    } catch (err) {
+      return next(err);
+    }
   },
 ];
 
@@ -60,42 +67,46 @@ exports.athenaeum_update_post = [
   body("name").notEmpty().withMessage("Name field must not be empty"),
 
   async (req, res, next) => {
-    const errors = validationResult(req);
+    try {
+      const errors = validationResult(req);
 
-    // If validation result got errors return them
-    if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
-      return;
-    }
+      // If validation result got errors return them
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+        return;
+      }
 
-    // Get athenaeum before any update
-    const oldAthenaeum = await Athenaeum.findById(req.params.id);
+      // Get athenaeum before any update
+      const oldAthenaeum = await Athenaeum.findById(req.params.id);
 
-    // Store for clarity modified input fields
-    const updatedName = req.body.name;
-    const updatedCourses = await Course.find({ name: req.body.courses }).select(
-      "_id"
-    );
+      // Store for clarity modified input fields
+      const updatedName = req.body.name;
+      const updatedCourses = await Course.find({
+        name: req.body.courses,
+      }).select("_id");
 
-    // Update athenaeum in database with new values
-    Athenaeum.findByIdAndUpdate(
-      req.params.id,
-      {
-        name: updatedName,
-        courses: updatedCourses,
-      },
-      { new: true }, // return updated goal instead of original
-      (err, newAthenaeum) => {
-        if (err) return next(err);
+      // Update athenaeum in database with new values
+      Athenaeum.findByIdAndUpdate(
+        req.params.id,
+        {
+          name: updatedName,
+          courses: updatedCourses,
+        },
+        { new: true }, // return updated goal instead of original
+        (err, newAthenaeum) => {
+          if (err) return next(err);
 
-        /* When updating an athenaeum user can also add or remove courses that are held in it.
+          /* When updating an athenaeum user can also add or remove courses that are held in it.
 
           With the updateAtheaneums static method on course model we can add or remove from it the atheneaum reference depending if there is a relation or not*/
-        Course.updateAtheaneums(oldAthenaeum, newAthenaeum);
+          Course.updateAtheaneums(oldAthenaeum, newAthenaeum);
 
-        res.redirect(newAthenaeum.url);
-      }
-    );
+          res.redirect(newAthenaeum.url);
+        }
+      );
+    } catch (err) {
+      return next(err);
+    }
   },
 ];
 
@@ -111,7 +122,11 @@ exports.athenaeum_delete_post = (req, res, next) => {
 };
 
 exports.athenaeum_detail = async (req, res, next) => {
-  const athenaeum = await Athenaeum.findById(req.params.id);
+  try {
+    const athenaeum = await Athenaeum.findById(req.params.id);
 
-  res.json({ athenaeum });
+    res.json({ athenaeum });
+  } catch (err) {
+    return next(err);
+  }
 };

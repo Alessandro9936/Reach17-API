@@ -1,25 +1,32 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const courseSchema = new Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  goals: [{ type: Schema.Types.ObjectId, ref: "Goal" }],
-  athenaeums: [{ type: Schema.Types.ObjectId, ref: "Athenaeum" }],
-});
+const courseSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    goals: [{ type: Schema.Types.ObjectId, ref: "Goal" }],
+    athenaeums: [{ type: Schema.Types.ObjectId, ref: "Athenaeum" }],
+  },
+  { timestamps: true }
+);
 
 // Similar to addCourseRelation on other models, this one also accept another parameter (elementType) which specifiecs whether the element to push is an athenaeum or a goal. This also allow to define in which array the element must be pushed
 courseSchema.static(
   "addRelations",
   async function (elementType, courseID, element) {
-    if (elementType === "goal") {
-      await this.findByIdAndUpdate(courseID, {
-        $push: { goals: element },
-      });
-    } else if (elementType === "athenaeum") {
-      await this.findByIdAndUpdate(courseID, {
-        $push: { athenaeums: element },
-      });
+    try {
+      if (elementType === "goal") {
+        await this.findByIdAndUpdate(courseID, {
+          $push: { goals: element },
+        });
+      } else if (elementType === "athenaeum") {
+        await this.findByIdAndUpdate(courseID, {
+          $push: { athenaeums: element },
+        });
+      }
+    } catch (err) {
+      throw err;
     }
   }
 );
@@ -27,14 +34,18 @@ courseSchema.static(
 courseSchema.static(
   "removeRelations",
   async function (elementType, courseID, element) {
-    if (elementType === "goal") {
-      await this.findByIdAndUpdate(courseID, {
-        $pull: { goals: element },
-      });
-    } else if (elementType === "athenaeum") {
-      await this.findByIdAndUpdate(courseID, {
-        $pull: { athenaeums: element },
-      });
+    try {
+      if (elementType === "goal") {
+        await this.findByIdAndUpdate(courseID, {
+          $pull: { goals: element },
+        });
+      } else if (elementType === "athenaeum") {
+        await this.findByIdAndUpdate(courseID, {
+          $pull: { athenaeums: element },
+        });
+      }
+    } catch (err) {
+      throw err;
     }
   }
 );
@@ -69,7 +80,7 @@ courseSchema.static("updateGoals", async function (oldGoal, newGoal) {
       }
     });
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 });
 
@@ -104,7 +115,7 @@ courseSchema.static(
         }
       });
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   }
 );
