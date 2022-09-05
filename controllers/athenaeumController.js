@@ -119,6 +119,7 @@ exports.athenaeum_delete_post = (req, res, next) => {
       Course.removeRelations("athenaeum", course._id, athenaeum._id);
     });
   });
+  res.end();
 };
 
 exports.athenaeum_detail = async (req, res, next) => {

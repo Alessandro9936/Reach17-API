@@ -147,14 +147,13 @@ exports.course_delete_post = (req, res, next) => {
 
     //Remove all reference to course in goal.courses & athenaeum.courses
     course.athenaeums.map((athenaeum) => {
-      Athenaeum.handleRelations("remove", athenaeum._id, course._id);
+      Athenaeum.removeCourseRelation(athenaeum._id, course._id);
     });
     course.goals.map((goal) => {
-      Goal.handleRelations("remove", goal._id, course._id);
+      Goal.removeCourseRelation(goal._id, course._id);
     });
   });
-
-  res.redirect("/");
+  res.end();
 };
 
 exports.course_detail = async (req, res, next) => {

@@ -128,6 +128,7 @@ exports.goal_delete_post = (req, res, next) => {
       Course.removeRelations("goal", course._id, goal._id);
     });
   });
+  res.end();
 };
 
 exports.goal_detail = async (req, res, next) => {
