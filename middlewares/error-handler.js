@@ -76,7 +76,7 @@ function errorHandlerMiddleware(error, req, res, next) {
   }
 
   const errorResponse = {
-    statusCode: getHTTPStatusCode({ error, response }),
+    statusCode: getHTTPStatusCode({ error, res }),
     body: undefined,
   };
 
