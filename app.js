@@ -52,9 +52,10 @@ app.use("/athenaeums", athenaeumRoutes);
 // ---------------------
 
 // Handle error if the routes not found or there's problem in DB connection
-app.use((err, req, res, next) => {
-  next(createHTTPError(404, err));
+app.use((req, res, next) => {
+  next(createHTTPError(404));
 });
+
 // Error handler
 app.use(errorHandlerMiddleware);
 // ---------------------
