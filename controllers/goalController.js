@@ -4,8 +4,14 @@ const Course = require("../models/courseModel");
 
 exports.goals_list = async (req, res, next) => {
   try {
-    const goals = await Goal.find();
-    res.json({ goals });
+    // Check if the query is empty, if it is get all athenaeums
+    if (Object.keys(req.query).length === 0) {
+      const goals = await Goal.find();
+      res.json({ goals });
+    }
+
+    const sortedGoals = await Goal.find({}).sort(req.query.sort);
+    res.json({ sortedGoals });
   } catch (err) {
     return next(err);
   }
@@ -41,7 +47,7 @@ exports.goal_create_post = [
       // Retrieve id of courses that user wants to belong in goal in order to store them in the new goal's schema
       const coursesInGoal = await Course.find({
         name: req.body.courses,
-      }).select("_id");
+      }).select(" _id");
 
       const goal = new Goal({
         name: req.body.name,
@@ -91,7 +97,7 @@ exports.goal_update_post = [
       const updateDescription = req.body.description;
       const updatedCourses = await Course.find({
         name: req.body.courses,
-      }).select("_id");
+      }).select(" _id");
 
       // Update goal in database with new values
       Goal.findByIdAndUpdate(

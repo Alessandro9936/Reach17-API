@@ -4,8 +4,14 @@ const Course = require("../models/courseModel");
 
 exports.athenaeums_list = async (req, res, next) => {
   try {
-    const athenaeums = await Athenaeum.find();
-    res.json({ athenaeums });
+    // Check if the query is empty, if it is get all athenaeums
+    if (Object.keys(req.query).length === 0) {
+      const athenaeums = await Athenaeum.find();
+      res.json({ athenaeums });
+    }
+
+    const sortedAthenaeums = await Athenaeum.find({}).sort(req.query.sort);
+    res.json({ sortedAthenaeums });
   } catch (err) {
     return next(err);
   }
