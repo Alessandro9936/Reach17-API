@@ -4,10 +4,24 @@ const Athenaeum = require("../models/athenaeumModel");
 const Course = require("../models/courseModel");
 const Goal = require("../models/goalModel");
 
+const filter = require("../utils/filter");
+
 exports.courses_list = async (req, res, next) => {
   try {
-    const courses = await Course.find();
-    res.json({ courses });
+    // Check if the query is empty, if it is get all courses
+    if (Object.keys(req.query).length === 0) {
+      const courses = await Course.find();
+      res.json({ courses });
+    }
+
+    // Keep only filter query and remove other type of queries
+    const reqQuery = { ...req.query };
+    const removeFields = ["sort", "limit"];
+    removeFields.forEach((value) => delete reqQuery[value]);
+
+    // Get filtered courses
+    const filteredCourses = await filter(req.query);
+    res.json({ filteredCourses });
   } catch (err) {
     return next(err);
   }
@@ -48,7 +62,7 @@ exports.course_create_post = [
       // Retrieve reference to athenaeums where course is held
       const coursesAthenaeums = await Athenaeum.find({
         name: req.body.athenaeums,
-      }).select("_id");
+      }).select(" _id");
 
       const course = new Course({
         name: req.body.name,
@@ -106,11 +120,11 @@ exports.course_update_post = [
       const updatedName = req.body.name;
       const updateDescription = req.body.description;
       const updatedGoals = await Goal.find({ name: req.body.goals }).select(
-        "_id"
+        " _id"
       );
       const updatedAthenaeums = await Athenaeum.find({
         name: req.body.athenaeums,
-      }).select("_id");
+      }).select(" _id");
 
       // Update course in database with new values
       Course.findByIdAndUpdate(
