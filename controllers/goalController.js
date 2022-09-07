@@ -1,24 +1,18 @@
 const { body, validationResult } = require("express-validator");
 const Goal = require("../models/goalModel");
-const Course = require("../models/courseModel");
+
+const goalServices = require("../services/goalServices");
 
 exports.goals_list = async (req, res, next) => {
   try {
-    // Check if the query is empty, if it is get all athenaeums
-    if (Object.keys(req.query).length === 0) {
-      const goals = await Goal.find();
-      res.json({ goals });
-    }
-
-    const sortedGoals = await Goal.find({}).sort(req.query.sort);
-    res.json({ sortedGoals });
+    const goals = await goalServices.goals_list(req.query);
+    res.status(200).json({ goals });
   } catch (err) {
     return next(err);
   }
 };
 
 exports.goal_create_post = [
-  // First / second middleware function --> Validate form input values
   body("name")
     .notEmpty()
     .withMessage("Name field must not be empty")
@@ -32,7 +26,6 @@ exports.goal_create_post = [
     .notEmpty()
     .withMessage("Description field must not be empty"),
 
-  // Third middleware function --> Handle errors from validation or save new course
   async (req, res, next) => {
     try {
       // Check if validation returned errors
@@ -40,33 +33,12 @@ exports.goal_create_post = [
 
       // If validation result got errors return them
       if (!errors.isEmpty()) {
-        res.status(400).json({ errors: errors.array() });
+        res.status(422).json({ errors: errors.array() });
         return;
       }
 
-      // Retrieve id of courses that user wants to belong in goal in order to store them in the new goal's schema
-      const coursesInGoal = await Course.find({
-        name: req.body.courses,
-      }).select(" _id");
-
-      const goal = new Goal({
-        name: req.body.name,
-        description: req.body.description,
-        courses: coursesInGoal,
-      });
-
-      // If courses are selected while creating new goal find and update these adding course reference to course.goals array
-      if (coursesInGoal.length > 0) {
-        coursesInGoal.map((course) => {
-          Course.addRelations("goal", course._id, goal);
-        });
-      }
-
-      // Validation passed, store new course in database and send it back
-      goal.save((err) => {
-        if (err) return next(err);
-        res.json({ goal });
-      });
+      const newGoal = await goalServices.goal_create_post(req);
+      res.status(201).json({ newGoal });
     } catch (err) {
       return next(err);
     }
@@ -85,63 +57,28 @@ exports.goal_update_post = [
 
       // If validation result got errors return them
       if (!errors.isEmpty()) {
-        res.status(400).json({ errors: errors.array() });
+        res.status(422).json({ errors: errors.array() });
         return;
       }
 
-      // Get goal before any update
-      const oldGoal = await Goal.findById(req.params.id);
-
-      // Store for clarity modified input fields
-      const updatedName = req.body.name;
-      const updateDescription = req.body.description;
-      const updatedCourses = await Course.find({
-        name: req.body.courses,
-      }).select(" _id");
-
-      // Update goal in database with new values
-      Goal.findByIdAndUpdate(
-        req.params.id,
-        {
-          name: updatedName,
-          description: updateDescription,
-          courses: updatedCourses,
-        },
-        { new: true }, // return updated goal instead of original
-        (err, newGoal) => {
-          if (err) return next(err);
-
-          /* When updating a goal user can also add or remove courses that belong in it.
-
-          With the updateGoals static method on course model we can add or remove from it the goal reference depending if there is a relation or not*/
-          Course.updateGoals(oldGoal, newGoal);
-
-          res.redirect(newGoal.url);
-        }
-      );
+      const updatedGoal = await goalServices.goal_update_post(req);
+      res.status(201).redirect(updatedGoal.url);
     } catch (err) {
       return next(err);
     }
   },
 ];
 
-exports.goal_delete_post = (req, res, next) => {
-  Goal.findByIdAndDelete(req.params.id, (err, goal) => {
-    if (err) return next(err);
-
-    //Remove all reference to course in goal.courses & athenaeum.courses
-    goal.courses.map((course) => {
-      Course.removeRelations("goal", course._id, goal._id);
-    });
-  });
-  res.end();
+exports.goal_delete_post = async (req, res, next) => {
+  await goalServices.goal_delete_post(req);
+  res.status(204).end();
 };
 
 exports.goal_detail = async (req, res, next) => {
   try {
-    const goal = await Goal.findById(req.params.id);
+    const goal = await goalServices.goal_detail(req);
 
-    res.json({ goal });
+    res.status(200).json({ goal });
   } catch (err) {
     return next(err);
   }

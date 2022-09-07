@@ -1,29 +1,19 @@
 const { body, validationResult } = require("express-validator");
 
-const Athenaeum = require("../models/athenaeumModel");
+const courseServices = require("../services/courseServices");
 const Course = require("../models/courseModel");
-const Goal = require("../models/goalModel");
-
-const filter = require("../utils/filter");
 
 exports.courses_list = async (req, res, next) => {
+  // Keep only filter query and remove other type of queries
+  const reqQuery = { ...req.query };
+  const removeFields = ["sort", "limit"];
+  removeFields.forEach((value) => delete reqQuery[value]);
+
   try {
-    // Check if the query is empty, if it is get all courses
-    if (Object.keys(req.query).length === 0) {
-      const courses = await Course.find();
-      res.json({ courses });
-    }
-
-    // Keep only filter query and remove other type of queries
-    const reqQuery = { ...req.query };
-    const removeFields = ["sort", "limit"];
-    removeFields.forEach((value) => delete reqQuery[value]);
-
-    // Get filtered courses
-    const filteredCourses = await filter(req.query);
-    res.json({ filteredCourses });
-  } catch (err) {
-    return next(err);
+    const courses = await courseServices.course_list(reqQuery);
+    res.status(200).json({ courses });
+  } catch (error) {
+    return next(error);
   }
 };
 
@@ -48,50 +38,16 @@ exports.course_create_post = [
       // Check if validation returned errors
       const errors = validationResult(req);
 
-      // If validation result got errors return them
+      // If validation result got errors throw them to be handled
       if (!errors.isEmpty()) {
-        res.status(400).json({ errors: errors.array() });
+        res.status(422).json({ errors: errors.array() });
         return;
       }
 
-      // Retrieve reference to course's goals
-      const courseGoals = await Goal.find({ name: req.body.goals }).select(
-        "_id"
-      );
-
-      // Retrieve reference to athenaeums where course is held
-      const coursesAthenaeums = await Athenaeum.find({
-        name: req.body.athenaeums,
-      }).select(" _id");
-
-      const course = new Course({
-        name: req.body.name,
-        description: req.body.description,
-        goals: courseGoals,
-        athenaeums: coursesAthenaeums,
-      });
-
-      // If course has goals find and update these adding course id to courses array
-      if (courseGoals.length > 0) {
-        courseGoals.forEach((goal) => {
-          Goal.addCourseRelation(goal._id, course);
-        });
-      }
-
-      // If course is held in athenaeums find and update these adding course id to courses array
-      if (coursesAthenaeums.length > 0) {
-        coursesAthenaeums.forEach((athenaeum) => {
-          Athenaeum.addCourseRelation(athenaeum._id, course);
-        });
-      }
-
-      // Validation passed, store new course in database and send it back
-      course.save((err) => {
-        if (err) return next(err);
-        res.json({ course });
-      });
-    } catch (err) {
-      return next(err);
+      const course = await courseServices.course_create_post(req);
+      res.status(201).json({ course });
+    } catch (error) {
+      return next(error);
     }
   },
 ];
@@ -102,79 +58,37 @@ exports.course_update_post = [
     .notEmpty()
     .withMessage("Description field must not be empty"),
 
-  // Third middleware function --> Handle errors from validation or update course and relations
   async (req, res, next) => {
     try {
       const errors = validationResult(req);
 
       // If validation result got errors return them
       if (!errors.isEmpty()) {
-        res.status(400).json({ errors: errors.array() });
+        res.status(422).json({ errors: errors.array() });
         return;
       }
 
-      // Get course before any update
-      const oldCourse = await Course.findById(req.params.id);
-
-      // Store for clarity updated input fields
-      const updatedName = req.body.name;
-      const updateDescription = req.body.description;
-      const updatedGoals = await Goal.find({ name: req.body.goals }).select(
-        " _id"
-      );
-      const updatedAthenaeums = await Athenaeum.find({
-        name: req.body.athenaeums,
-      }).select(" _id");
-
-      // Update course in database with new values
-      Course.findByIdAndUpdate(
-        req.params.id,
-        {
-          name: updatedName,
-          description: updateDescription,
-          goals: updatedGoals,
-          athenaeums: updatedAthenaeums,
-        },
-        { new: true }, // return update goal instead of original
-        (err, newCourse) => {
-          if (err) throw err;
-
-          /* When updating a course as well as name and description the user can also remove or add
-          athenaeums where the course is held or goals which the course belongs in.
-
-          With the updateCourses static method on each model we can add or remove the course reference depending if there is a relation or not*/
-          Goal.updateCourses(oldCourse, newCourse);
-          Athenaeum.updateCourses(oldCourse, newCourse);
-
-          res.redirect(newCourse.url);
-        }
-      );
+      const updatedCourse = await courseServices.course_update_post(req);
+      res.status(201).redirect(updatedCourse.url);
     } catch (err) {
       return next(err);
     }
   },
 ];
 
-exports.course_delete_post = (req, res, next) => {
-  Course.findByIdAndDelete(req.params.id, (err, course) => {
-    if (err) return next(err);
-
-    //Remove all reference to course in goal.courses & athenaeum.courses
-    course.athenaeums.map((athenaeum) => {
-      Athenaeum.removeCourseRelation(athenaeum._id, course._id);
-    });
-    course.goals.map((goal) => {
-      Goal.removeCourseRelation(goal._id, course._id);
-    });
-  });
-  res.end();
+exports.course_delete_post = async (req, res, next) => {
+  try {
+    await courseServices.course_delete_post(req);
+    res.status(204).end();
+  } catch (error) {
+    return next(error);
+  }
 };
 
 exports.course_detail = async (req, res, next) => {
   try {
-    const course = await Course.findById(req.params.id);
-
-    res.json({ course });
+    const course = await courseServices.course_detail(req);
+    res.status(200).json({ course });
   } catch (err) {
     return next(err);
   }
