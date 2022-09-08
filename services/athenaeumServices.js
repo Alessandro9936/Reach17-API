@@ -1,6 +1,8 @@
 const Athenaeum = require("../models/athenaeumModel");
 const Course = require("../models/courseModel");
 
+const createError = require("http-errors");
+
 const athenaeums_list = async (query) => {
   try {
     // Check if the query is empty, if it is get all athenaeums
@@ -12,7 +14,7 @@ const athenaeums_list = async (query) => {
     const sortedAthenaeums = await Athenaeum.find({}).sort(query.sort);
     return sortedAthenaeums;
   } catch (error) {
-    return { status: 500, error };
+    throw createError(500, error);
   }
 };
 
@@ -41,7 +43,7 @@ const athenaeum_create_post = async (req) => {
     await athenaeum.save();
     return athenaeum;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 
@@ -75,7 +77,7 @@ const athenaeum_update_post = async (req) => {
     Course.updateAtheaneums(oldAthenaeum, updatedAthenaeum);
     return updatedAthenaeum;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 
@@ -89,7 +91,7 @@ const athenaeum_delete_post = async (req) => {
 
     return deletedAthenaeum;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 
@@ -98,7 +100,7 @@ const athenaeum_detail = async (req) => {
     const athenaeum = await Athenaeum.findById(req.params.id);
     return athenaeum;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 

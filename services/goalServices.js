@@ -12,7 +12,7 @@ const goals_list = async (query) => {
     const sortedGoals = await Goal.find({}).sort(query.sort);
     return sortedGoals;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 
@@ -42,7 +42,7 @@ const goal_create_post = async (req) => {
     await goal.save();
     return goal;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 
@@ -77,7 +77,7 @@ const goal_update_post = async (req) => {
     Course.updateGoals(oldGoal, updatedGoal);
     return updatedGoal;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 
@@ -101,7 +101,7 @@ const goal_detail = async (req) => {
     const goal = await Goal.findById(req.params.id);
     return goal;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 

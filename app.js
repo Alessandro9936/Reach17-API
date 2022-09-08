@@ -53,7 +53,7 @@ app.use("/athenaeums", athenaeumRoutes);
 
 // Handle error if the routes not found or there's problem in DB connection
 app.use((req, res, next) => {
-  next(createHTTPError(404));
+  next(createHTTPError(404, "Page Not Found"));
 });
 
 // Error handler

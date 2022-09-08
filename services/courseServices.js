@@ -37,7 +37,7 @@ const course_list = async (query) => {
       return coursesWithAthenaeum;
     }
   } catch (error) {
-    throw { status: 500, message: error };
+    throw createError(500, error);
   }
 };
 
@@ -79,7 +79,7 @@ const course_create_post = async (req) => {
     await course.save();
     return course;
   } catch (error) {
-    throw { status: 500, message: error };
+    throw createError(500, error);
   }
 };
 
@@ -120,7 +120,7 @@ const course_update_post = async (req) => {
 
     return updatedCourse;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 
@@ -138,7 +138,7 @@ const course_delete_post = async (req) => {
 
     return deleteCourse;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 
@@ -147,7 +147,7 @@ const course_detail = async (req) => {
     const course = await Course.findById(req.params.id);
     return course;
   } catch (error) {
-    throw { status: 500, error };
+    throw createError(500, error);
   }
 };
 
