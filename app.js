@@ -59,3 +59,5 @@ app.use((req, res, next) => {
 // Error handler
 app.use(errorHandlerMiddleware);
 // ---------------------
+
+module.exports = app;
