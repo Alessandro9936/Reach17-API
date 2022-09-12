@@ -1,9 +1,7 @@
 // Import all dependecies
 require("dotenv").config();
 const express = require("express");
-const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
-const cors = require("cors");
 const multer = require("multer")();
 
 const createHTTPError = require("http-errors");
@@ -13,11 +11,13 @@ const errorHandlerMiddleware = require("./middlewares/error-handler");
 
 // Initiate app with express
 const app = express();
-app.listen(process.env.PORT || 3000);
+const connectDB = require("./configs/db.config");
 
 // Import and connect DB
-const connectDB = require("./configs/db.config");
-connectDB();
+if (process.env.NODE_ENV !== "test") {
+  connectDB();
+  app.listen(process.env.PORT || 3000);
+}
 
 // Import Routes
 
@@ -33,12 +33,6 @@ app.use(express.json());
 
 // Log the request
 app.use(morgan("dev"));
-
-// Determine which domain can access the website
-app.use(cors());
-
-// Middleware for cookies
-app.use(cookieParser());
 // ---------------------
 
 // Initiate Routes
