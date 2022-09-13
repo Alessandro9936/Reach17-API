@@ -62,7 +62,7 @@ exports.goal_update_post = [
       }
 
       const updatedGoal = await goalServices.goal_update_post(req);
-      res.status(201).redirect(updatedGoal.url);
+      res.status(201).json(updatedGoal);
     } catch (err) {
       return next(err);
     }
