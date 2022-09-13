@@ -44,8 +44,8 @@ exports.course_create_post = [
         return;
       }
 
-      const course = await courseServices.course_create_post(req);
-      res.status(201).json({ course });
+      const newCourse = await courseServices.course_create_post(req);
+      res.status(201).json(newCourse);
     } catch (error) {
       return next(error);
     }
@@ -69,7 +69,7 @@ exports.course_update_post = [
       }
 
       const updatedCourse = await courseServices.course_update_post(req);
-      res.status(201).redirect(updatedCourse.url);
+      res.status(201).json(updatedCourse);
     } catch (err) {
       return next(err);
     }
@@ -88,7 +88,7 @@ exports.course_delete_post = async (req, res, next) => {
 exports.course_detail = async (req, res, next) => {
   try {
     const course = await courseServices.course_detail(req);
-    res.status(200).json({ course });
+    res.status(200).json(course);
   } catch (err) {
     return next(err);
   }

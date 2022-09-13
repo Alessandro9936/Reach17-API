@@ -38,7 +38,7 @@ exports.goal_create_post = [
       }
 
       const newGoal = await goalServices.goal_create_post(req);
-      res.status(201).json({ newGoal });
+      res.status(201).json(newGoal);
     } catch (err) {
       return next(err);
     }
@@ -70,7 +70,7 @@ exports.goal_update_post = [
 ];
 
 exports.goal_delete_post = async (req, res, next) => {
-  await goalServices.goal_delete_post(req);
+  const deletedGoal = await goalServices.goal_delete_post(req);
   res.status(204).end();
 };
 
@@ -78,7 +78,7 @@ exports.goal_detail = async (req, res, next) => {
   try {
     const goal = await goalServices.goal_detail(req);
 
-    res.status(200).json({ goal });
+    res.status(200).json(goal);
   } catch (err) {
     return next(err);
   }

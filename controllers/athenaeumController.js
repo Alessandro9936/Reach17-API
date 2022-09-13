@@ -57,7 +57,7 @@ exports.athenaeum_update_post = [
       const updatedAthenaeum = await athenaeumServices.athenaeum_update_post(
         req
       );
-      res.status(201).redirect(updatedAthenaeum.url);
+      res.status(201).json(updatedAthenaeum);
     } catch (err) {
       return next(err);
     }
@@ -77,7 +77,7 @@ exports.athenaeum_detail = async (req, res, next) => {
   try {
     const athenaeum = await athenaeumServices.athenaeum_detail(req);
 
-    res.status(200).json({ athenaeum });
+    res.status(200).json(athenaeum);
   } catch (err) {
     return next(err);
   }
