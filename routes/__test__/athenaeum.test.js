@@ -136,13 +136,10 @@ describe("PUT /athenaeums/:id", () => {
 describe("delete /athenaeums/:id", () => {
   test("update an athenaeum if input fields are valid", (done) => {
     Athenaeum.create({ name: "athenaeumTest" }).then((ath) => {
-      agent
-        .delete("/athenaeums/" + ath._id)
-        .send({ name: "athenaeumUp" })
-        .then((res) => {
-          expect(res.status).toBe(204);
-          done();
-        });
+      agent.delete("/athenaeums/" + ath._id).then((res) => {
+        expect(res.status).toBe(204);
+        done();
+      });
     });
   });
 });
