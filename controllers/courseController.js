@@ -21,7 +21,7 @@ exports.course_create_post = [
   // First / second middleware function --> Validate form input values
   body("name")
     .notEmpty()
-    .withMessage("Name field must not be empty")
+    .withMessage("Course name field must not be empty")
     .custom(async (value) => {
       const existingCourse = await Course.findOne({ name: value });
       if (existingCourse) {
@@ -30,7 +30,7 @@ exports.course_create_post = [
     }),
   body("description")
     .notEmpty()
-    .withMessage("Description field must not be empty"),
+    .withMessage("Course description field must not be empty"),
 
   // Third middleware function --> Handle errors from validation or save new course
   async (req, res, next) => {

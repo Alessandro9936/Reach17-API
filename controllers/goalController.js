@@ -15,7 +15,7 @@ exports.goals_list = async (req, res, next) => {
 exports.goal_create_post = [
   body("name")
     .notEmpty()
-    .withMessage("Name field must not be empty")
+    .withMessage("Goal name field must not be empty")
     .custom(async (value) => {
       const existingGoald = await Goal.findOne({ name: value });
       if (existingGoald) {
@@ -24,7 +24,7 @@ exports.goal_create_post = [
     }),
   body("description")
     .notEmpty()
-    .withMessage("Description field must not be empty"),
+    .withMessage("Goal description field must not be empty"),
 
   async (req, res, next) => {
     try {

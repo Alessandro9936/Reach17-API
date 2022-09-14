@@ -15,7 +15,7 @@ exports.athenaeums_list = async (req, res, next) => {
 exports.athenaeum_create_post = [
   body("name")
     .notEmpty()
-    .withMessage("Athenaeum field must not be empty")
+    .withMessage("Athenaeum name field must not be empty")
     .custom(async (value) => {
       const existingAthenaeum = await Athenaeum.findOne({ name: value });
       if (existingAthenaeum) {
