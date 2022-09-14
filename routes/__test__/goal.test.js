@@ -15,6 +15,7 @@ afterAll(async () => {
 });
 
 describe("GET /goals", () => {
+  // Clean and populate with fake data in-memory database for testing purposes
   beforeEach(async () => {
     await db.clear();
   });
@@ -72,11 +73,15 @@ describe("POST /goals", () => {
   test("create new goal if input fields are valid", (done) => {
     agent
       .post("/goals")
-      .send({ name: "goalTest", description: "goalTest" })
+      .send({
+        name: "goalTest",
+        description: "goalTest",
+        courses: ["course1", "course3"],
+      })
       .then((res) => {
         expect(res.status).toBe(201);
         expect(res.body.name).toBe("goalTest");
-        expect(res.body.courses).toEqual([]);
+        expect(res.body.courses.length).toBeGreaterThanOrEqual(0);
         done();
       });
   });
@@ -89,6 +94,9 @@ describe("POST /goals", () => {
         expect(res.status).toBe(400);
         expect(res.error).toBeTruthy();
         expect(res.body).toHaveProperty("errors");
+        expect(res.body.errors[0].msg).toBe(
+          "Goal name field must not be empty"
+        );
         done();
       });
   });
@@ -101,6 +109,9 @@ describe("POST /goals", () => {
         expect(res.status).toBe(400);
         expect(res.error).toBeTruthy();
         expect(res.body).toHaveProperty("errors");
+        expect(res.body.errors[0].msg).toBe(
+          "Goal description field must not be empty"
+        );
         done();
       });
   });
@@ -129,12 +140,16 @@ describe("PUT /goals/:id", () => {
     Goal.create({ name: "goalTest", description: "goalTest" }).then((goal) => {
       agent
         .put("/goals/" + goal._id)
-        .send({ name: "goalTestUpdated", description: "goalTestUpdated" })
+        .send({
+          name: "goalTestUpdated",
+          description: "goalTestUpdated",
+          courses: ["course1"],
+        })
         .then((res) => {
           expect(res.status).toBe(201);
           expect(res.body.name).toBe("goalTestUpdated");
           expect(res.body.description).toBe("goalTestUpdated");
-          expect(res.body.courses).toEqual([]);
+          expect(res.body.courses.length).toBeGreaterThan(0);
           expect(res.body._id).toEqual(goal._id.toString());
           done();
         });

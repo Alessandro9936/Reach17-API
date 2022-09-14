@@ -15,6 +15,7 @@ afterAll(async () => {
 });
 
 describe("GET /athenaeums", () => {
+  // Clean and populate with fake data in-memory database for testing purposes
   beforeEach(async () => {
     await db.clear();
   });
@@ -76,11 +77,11 @@ describe("POST /athenaems", () => {
   test("create new athenaeum if input fields are valid", (done) => {
     agent
       .post("/athenaeums")
-      .send({ name: "athenaeumTest" })
+      .send({ name: "athenaeumTest", courses: ["course1", "course2"] })
       .then((res) => {
         expect(res.status).toBe(201);
         expect(res.body.name).toBe("athenaeumTest");
-        expect(res.body.courses).toEqual([]);
+        expect(res.body.courses.length).toBeGreaterThanOrEqual(0);
         done();
       });
   });
@@ -93,6 +94,9 @@ describe("POST /athenaems", () => {
         expect(res.status).toBe(400);
         expect(res.error).toBeTruthy();
         expect(res.body).toHaveProperty("errors");
+        expect(res.body.errors[0].msg).toBe(
+          "Athenaeum name field must not be empty"
+        );
         done();
       });
   });
@@ -121,11 +125,11 @@ describe("PUT /athenaeums/:id", () => {
     Athenaeum.create({ name: "athenaeumTest" }).then((ath) => {
       agent
         .put("/athenaeums/" + ath._id)
-        .send({ name: "athenaeumUp" })
+        .send({ name: "athenaeumUp", courses: ["course2", "course3"] })
         .then((res) => {
           expect(res.status).toBe(201);
           expect(res.body.name).toBe("athenaeumUp");
-          expect(res.body.courses).toEqual([]);
+          expect(res.body.courses.length).toBeGreaterThan(0);
           expect(res.body._id).toEqual(ath._id.toString());
           done();
         });
