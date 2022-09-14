@@ -24,6 +24,7 @@ if (process.env.NODE_ENV !== "test") {
 const goalRoutes = require("./routes/goal");
 const courseRoutes = require("./routes/course");
 const athenaeumRoutes = require("./routes/athenaeum");
+const indexRoutes = require("./routes/index");
 
 // Initiate App Middlewares
 
@@ -36,6 +37,7 @@ app.use(morgan("dev"));
 // ---------------------
 
 // Initiate Routes
+app.use("/", indexRoutes);
 app.use("/goals", goalRoutes);
 app.use("/courses", courseRoutes);
 app.use("/athenaeums", athenaeumRoutes);
