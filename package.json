@@ -1,6 +1,9 @@
 {
   "name": "s2i_node",
   "version": "1.0.0",
+  "engines": {
+    "node": "16.14.2"
+  },
   "description": "",
   "main": "app.js",
   "jest": {
