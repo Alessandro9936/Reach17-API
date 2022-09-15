@@ -67,7 +67,7 @@ exports.goal_update_post = [
 
       // If validation result got errors return them
       if (!errors.isEmpty()) {
-        res.status(422).json({ errors: errors.array() });
+        res.status(400).json({ errors: errors.array() });
         return;
       }
 
