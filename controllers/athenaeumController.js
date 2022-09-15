@@ -16,12 +16,15 @@ exports.athenaeum_create_post = [
   body("name")
     .notEmpty()
     .withMessage("Athenaeum name field must not be empty")
+    .isAlphanumeric()
+    .withMessage("field must contain only letters or numbers")
     .custom(async (value) => {
       const existingAthenaeum = await Athenaeum.findOne({ name: value });
       if (existingAthenaeum) {
         throw new Error(`${value} already exists`);
       }
-    }),
+    })
+    .escape(),
 
   async (req, res, next) => {
     try {
@@ -43,7 +46,12 @@ exports.athenaeum_create_post = [
 ];
 
 exports.athenaeum_update_post = [
-  body("name").notEmpty().withMessage("Name field must not be empty"),
+  body("name")
+    .notEmpty()
+    .withMessage("Name field must not be empty")
+    .isAlphanumeric()
+    .withMessage("field must contain only letters or numbers")
+    .escape(),
 
   async (req, res, next) => {
     try {
