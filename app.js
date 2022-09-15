@@ -3,6 +3,8 @@ require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const multer = require("multer")();
+const compression = require("compression");
+const helmet = require("helmet");
 
 const createHTTPError = require("http-errors");
 
@@ -28,9 +30,16 @@ const indexRoutes = require("./routes/index");
 
 // Initiate App Middlewares
 
+// Use gzip compression to decrease the size of the response body and increase speed of app
+app.use(compression());
+
+// Use helmet to procect against well known vulnerabilities
+app.use(helmet());
+
 // Parses incoming requests
 app.use(multer.any());
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // Log the request
 app.use(morgan("dev"));
