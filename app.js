@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const multer = require("multer")();
 const compression = require("compression");
 const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
 
 const createHTTPError = require("http-errors");
 
@@ -40,6 +41,9 @@ app.use(helmet());
 app.use(multer.any());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Sanitize user-supplied data to prevent MongoDB operator injections
+app.use(mongoSanitize({ replaceWith: "_" }));
 
 // Log the request
 app.use(morgan("dev"));
