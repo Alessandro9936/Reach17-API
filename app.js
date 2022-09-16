@@ -7,8 +7,8 @@ const compression = require("compression");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 
-const swaggerDoc = require("swagger-ui-express");
-const swaggerDocumentation = require("./helpers/documentation");
+const swaggerUI = require("swagger-ui-express");
+const swaggerSetup = require("./helpers/swaggerSetup");
 
 const createHTTPError = require("http-errors");
 
@@ -58,8 +58,7 @@ app.use("/goals", goalRoutes);
 app.use("/courses", courseRoutes);
 app.use("/athenaeums", athenaeumRoutes);
 
-app.use("/documentations", swaggerDoc.serve);
-app.use("/documentations", swaggerDoc.setup(swaggerDocumentation));
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSetup));
 //
 
 // Initiate middlewares (auth, pass)
