@@ -16,8 +16,6 @@ exports.goal_create_post = [
   body("name")
     .notEmpty()
     .withMessage("Goal name field must not be empty")
-    .isAlphanumeric()
-    .withMessage("field must contain only letters or numbers")
     .custom(async (value) => {
       const existingGoald = await Goal.findOne({ name: value });
       if (existingGoald) {
@@ -50,12 +48,7 @@ exports.goal_create_post = [
 ];
 
 exports.goal_update_post = [
-  body("name")
-    .notEmpty()
-    .withMessage("Name field must not be empty")
-    .isAlphanumeric()
-    .withMessage("field must contain only letters or numbers")
-    .escape(),
+  body("name").notEmpty().withMessage("Name field must not be empty").escape(),
   body("description")
     .notEmpty()
     .withMessage("Description field must not be empty")

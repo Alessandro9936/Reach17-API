@@ -22,8 +22,6 @@ exports.course_create_post = [
   body("name")
     .notEmpty()
     .withMessage("Course name field must not be empty")
-    .isAlphanumeric()
-    .withMessage("field must contain only letters or numbers")
     .custom(async (value) => {
       const existingCourse = await Course.findOne({ name: value });
       if (existingCourse) {
