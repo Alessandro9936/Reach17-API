@@ -6,9 +6,10 @@ const multer = require("multer")();
 const compression = require("compression");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
+const yaml = require("yamljs");
 
 const swaggerDoc = require("swagger-ui-express");
-const swaggerDocumentation = require("./helpers/documentation");
+const swaggerDocumentation = yaml.load("./helpers/documentation.yaml");
 
 const createHTTPError = require("http-errors");
 
@@ -58,11 +59,11 @@ app.use("/goals", goalRoutes);
 app.use("/courses", courseRoutes);
 app.use("/athenaeums", athenaeumRoutes);
 
-app.use("/documentations", swaggerDoc.serve);
-app.use("/documentations", swaggerDoc.setup(swaggerDocumentation));
-//
-
-// Initiate middlewares (auth, pass)
+app.use(
+  "/documentations",
+  swaggerDoc.serve,
+  swaggerDoc.setup(swaggerDocumentation)
+);
 
 // ---------------------
 
