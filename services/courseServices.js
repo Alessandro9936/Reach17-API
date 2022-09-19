@@ -8,20 +8,26 @@ const course_list = async (query) => {
   try {
     // Check if the query is empty, if it is get all courses
     if (Object.keys(query).length === 0) {
-      const allCourses = await Course.find();
+      const allCourses = await Course.find()
+        .populate({ path: "goals", select: "name" })
+        .populate({ path: "athenaeums", select: "name" });
       return allCourses;
     }
 
     // If query filter by name, find course with name
     if (query.name) {
-      const course = await Course.find({ name: query.name });
+      const course = await Course.find({ name: query.name })
+        .populate({ path: "goals", select: "name" })
+        .populate({ path: "athenaeums", select: "name" });
       return course;
     }
 
     // If query filter by goal name, first find goal id and then search courses that have goal id in courses.goals
     if (query.goals) {
       const goalID = await Goal.findOne({ name: query.goals }, "_id");
-      const coursesWithGoal = await Course.find({ goals: goalID });
+      const coursesWithGoal = await Course.find({ goals: goalID })
+        .populate({ path: "goals", select: "name" })
+        .populate({ path: "athenaeums", select: "name" });
       return coursesWithGoal;
     }
 
@@ -35,7 +41,9 @@ const course_list = async (query) => {
       );
       const coursesWithAthenaeum = await Course.find({
         athenaeums: athenaeumID,
-      });
+      })
+        .populate({ path: "goals", select: "name" })
+        .populate({ path: "athenaeums", select: "name" });
       return coursesWithAthenaeum;
     }
   } catch (error) {
