@@ -1,6 +1,3 @@
-const { body, validationResult } = require("express-validator");
-const Goal = require("../models/goalModel");
-
 const goalServices = require("../services/goalServices");
 
 exports.goals_list = async (req, res, next) => {
@@ -12,65 +9,23 @@ exports.goals_list = async (req, res, next) => {
   }
 };
 
-exports.goal_create_post = [
-  body("name")
-    .notEmpty()
-    .withMessage("Goal name field must not be empty")
-    .custom(async (value) => {
-      const existingGoald = await Goal.findOne({ name: value });
-      if (existingGoald) {
-        throw new Error(`${value} already exists`);
-      }
-    })
-    .escape(),
-  body("description")
-    .notEmpty()
-    .withMessage("Goal description field must not be empty")
-    .escape(),
+exports.goal_create_post = async (req, res, next) => {
+  try {
+    const newGoal = await goalServices.goal_create_post(req);
+    res.status(201).json(newGoal);
+  } catch (err) {
+    return next(err);
+  }
+};
 
-  async (req, res, next) => {
-    try {
-      // Check if validation returned errors
-      const errors = validationResult(req);
-
-      // If validation result got errors return them
-      if (!errors.isEmpty()) {
-        res.status(400).json({ errors: errors.array() });
-        return;
-      }
-
-      const newGoal = await goalServices.goal_create_post(req);
-      res.status(201).json(newGoal);
-    } catch (err) {
-      return next(err);
-    }
-  },
-];
-
-exports.goal_update_post = [
-  body("name").notEmpty().withMessage("Name field must not be empty").escape(),
-  body("description")
-    .notEmpty()
-    .withMessage("Description field must not be empty")
-    .escape(),
-
-  async (req, res, next) => {
-    try {
-      const errors = validationResult(req);
-
-      // If validation result got errors return them
-      if (!errors.isEmpty()) {
-        res.status(400).json({ errors: errors.array() });
-        return;
-      }
-
-      const updatedGoal = await goalServices.goal_update_post(req);
-      res.status(201).json(updatedGoal);
-    } catch (err) {
-      return next(err);
-    }
-  },
-];
+exports.goal_update_post = async (req, res, next) => {
+  try {
+    const updatedGoal = await goalServices.goal_update_post(req);
+    res.status(201).json(updatedGoal);
+  } catch (err) {
+    return next(err);
+  }
+};
 
 exports.goal_delete_post = async (req, res, next) => {
   const deletedGoal = await goalServices.goal_delete_post(req);
