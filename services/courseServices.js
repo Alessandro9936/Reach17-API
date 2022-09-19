@@ -2,6 +2,8 @@ const Course = require("../models/courseModel");
 const Athenaeum = require("../models/athenaeumModel");
 const Goal = require("../models/goalModel");
 
+const createError = require("http-errors");
+
 const course_list = async (query) => {
   try {
     // Check if the query is empty, if it is get all courses

@@ -1,6 +1,8 @@
 const Goal = require("../models/goalModel");
 const Course = require("../models/courseModel");
 
+const createError = require("http-errors");
+
 const goals_list = async (query) => {
   try {
     // Check if the query is empty, if it is get all athenaeums
