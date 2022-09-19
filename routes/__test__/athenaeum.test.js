@@ -94,9 +94,7 @@ describe("POST /athenaems", () => {
         expect(res.status).toBe(400);
         expect(res.error).toBeTruthy();
         expect(res.body).toHaveProperty("errors");
-        expect(res.body.errors[0].msg).toBe(
-          "Athenaeum name field must not be empty"
-        );
+        expect(res.body.errors[0].msg).toBe("Name field must not be empty");
         done();
       });
   });

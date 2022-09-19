@@ -56,7 +56,7 @@ describe("GET /goals", () => {
 
 describe("GET /goals/:id", () => {
   test("return goal if id exists", (done) => {
-    Goal.create({ name: "goalTest", description: "goalTest" }).then((goal) => {
+    Goal.create({ name: "goalTest" }).then((goal) => {
       agent.get("/goals/" + goal._id).then((res) => {
         expect(res.status).toBe(200);
         expect(res.body._id).toEqual(goal._id.toString());
@@ -75,7 +75,7 @@ describe("POST /goals", () => {
       .post("/goals")
       .send({
         name: "goalTest",
-        description: "goalTest",
+
         courses: ["course1", "course3"],
       })
       .then((res) => {
@@ -89,28 +89,13 @@ describe("POST /goals", () => {
   test("return validation error if input field name is not defined", (done) => {
     agent
       .post("/goals")
-      .send({ name: "", description: "testGoal" })
+      .send({ name: "" })
       .then((res) => {
         expect(res.status).toBe(400);
         expect(res.error).toBeTruthy();
         expect(res.body).toHaveProperty("errors");
         expect(res.body.errors[0].msg).toBe(
-          "Goal name field must not be empty"
-        );
-        done();
-      });
-  });
-
-  test("return validation error if input field description is not defined", (done) => {
-    agent
-      .post("/goals")
-      .send({ name: "testGoal", description: "" })
-      .then((res) => {
-        expect(res.status).toBe(400);
-        expect(res.error).toBeTruthy();
-        expect(res.body).toHaveProperty("errors");
-        expect(res.body.errors[0].msg).toBe(
-          "Goal description field must not be empty"
+          "Name field must not be empty"
         );
         done();
       });
@@ -119,11 +104,11 @@ describe("POST /goals", () => {
   test("return validation error if input fields are duplicate", (done) => {
     agent
       .post("/goals")
-      .send({ name: "goalTest", description: "goalTest" })
+      .send({ name: "goalTest" })
       .then(() => {
         agent
           .post("/goals")
-          .send({ name: "goalTest", description: "goalTest" })
+          .send({ name: "goalTest" })
           .then((res) => {
             expect(res.status).toBe(400);
             expect(res.error).toBeTruthy();
@@ -137,18 +122,16 @@ describe("POST /goals", () => {
 
 describe("PUT /goals/:id", () => {
   test("update a goal if input fields are valid", (done) => {
-    Goal.create({ name: "goalTest", description: "goalTest" }).then((goal) => {
+    Goal.create({ name: "goalTest" }).then((goal) => {
       agent
         .put("/goals/" + goal._id)
         .send({
           name: "goalTestUpdated",
-          description: "goalTestUpdated",
           courses: ["course1"],
         })
         .then((res) => {
           expect(res.status).toBe(201);
           expect(res.body.name).toBe("goalTestUpdated");
-          expect(res.body.description).toBe("goalTestUpdated");
           expect(res.body.courses.length).toBeGreaterThan(0);
           expect(res.body._id).toEqual(goal._id.toString());
           done();
@@ -161,7 +144,6 @@ describe("delete /goals/:id", () => {
   test("update agoal if input fields are valid", (done) => {
     Goal.create({
       name: "goalTestUpdated",
-      description: "goalTestUpdated",
     }).then((goal) => {
       agent.delete("/goals/" + goal._id).then((res) => {
         expect(res.status).toBe(204);
