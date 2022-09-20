@@ -12,6 +12,7 @@ info:
     email: alecrinella99@gmail.com
   version: 1.0.0
 servers:
+  - url: https://s2i-node.onrender.com/
   - url: http://localhost:3000/
     description: Localhost development server
 tags:
