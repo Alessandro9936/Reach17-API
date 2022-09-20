@@ -1,0 +1,665 @@
+openapi: 3.0.0
+info:
+  title: Start2Impact - NodeJS
+  description: |-
+    Reach17 is a ONU goal-based platform that need to catalog the courses it will offer.
+
+    This RESTful JSON API will manage the insertion of these courses.
+
+    Some useful links: 
+    - [GitHub Repository](https://github.com/Alessandro9936/S2I_node)
+  contact:
+    email: alecrinella99@gmail.com
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/
+    description: Localhost development server
+tags:
+  - name: course
+    description: Everything about courses
+  - name: goal
+    description: Everything about ONU goals
+  - name: athenaeum
+    description: Everything about athenaeums
+
+components:
+  schemas:
+    Goal:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: ObjectID
+          example: 6328312757ae36961286b49f
+        name:
+          type: string
+          example: Goal name
+        courses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Course"
+          example:
+            - id: 6328317757ae36961286b4bc
+              name: Course about something
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Athenaeum:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: ObjectID
+          example: 6328314757ae36961286b4af
+        name:
+          type: string
+          example: Athenaeums name
+        courses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Course"
+          example:
+            - id: 6328317757ae36961286b4bc
+              name: Course about something
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Course:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: ObjectID
+          example: 6328317757ae36961286b4bc
+        name:
+          type: string
+          example: Course about ...
+        goals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Goal"
+          example:
+            - id: 6328312757ae36961286b49f
+              name: Goal name
+        athenaeums:
+          type: array
+          items:
+            $ref: "#/components/schemas/Athenaeum"
+          example:
+            - id: 6328314757ae36961286b4af
+              name: Athenaeum name
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+  requestBodies:
+    CourseBody:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: INSERT NEW NAME
+        goals:
+          type: array
+          items:
+            type: string
+            example: Gender Equality
+        athenaeums:
+          type: array
+          items:
+            type: string
+            example: Athenaeum of Amsterdam
+    GoalBody:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: INSERT NEW NAME
+        courses:
+          type: array
+          items:
+            type: string
+            example: Course about no poverty
+    AthenaeumBody:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: INSERT NEW NAME
+        courses:
+          type: array
+          items:
+            type: string
+            example: Course about no poverty
+
+paths:
+  /courses:
+    get:
+      tags:
+        - course
+      summary: Retrieves a list of Courses
+      description: Retrieves a list of courses as JSON objects.
+      operationId: courses_list
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+        500:
+          description: Internal Server Error.
+
+    post:
+      tags:
+        - course
+      summary: Create a new course
+      description: Create a new course
+      operationId: course_create_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/CourseBody"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/requestBodies/CourseBody"
+
+      responses:
+        201:
+          description: Course created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        400:
+          description: Invalid Input Fields
+        500:
+          description: Internal Server Error
+
+  /courses?name:
+    get:
+      tags:
+        - course
+      summary: Retrieves a list of Courses filtered by name
+      description: Retrieves a list of courses filtered by name as JSON objects.
+      operationId: courses_list
+      parameters:
+        - name: name
+          in: query
+          description: Name value that need to be considered for filter
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+        500:
+          description: Internal Server Error.
+
+  /courses?goals:
+    get:
+      tags:
+        - course
+      summary: Retrieves a list of Courses that belong to a specific Goal
+      description: Retrieves a list of courses that belong to a specific Goal as JSON objects.
+      operationId: courses_list
+      parameters:
+        - name: goals
+          in: query
+          description: Goal name value that need to be considered for filter
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+        500:
+          description: Internal Server Error.
+
+  /courses?athenaeums:
+    get:
+      tags:
+        - course
+      summary: Retrieves a list of Courses that are held in a specific Athenaeum
+      description: Retrieves a list of coursesthat are held in a specific Athenaeum as JSON objects.
+      operationId: courses_list
+      parameters:
+        - name: athenaeums
+          in: query
+          description: Athenaeum name value that need to be considered for filter
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+        500:
+          description: Internal Server Error.
+
+  /courses/{id}:
+    get:
+      tags:
+        - course
+      summary: Retrieves Course by ID
+      description: Retrieves a single Course as JSON objects.
+      operationId: course_detail
+      parameters:
+        - name: id
+          in: path
+          description: Id of course to get
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        500:
+          description: Internal Server Error.
+
+    put:
+      tags:
+        - course
+      summary: Updates a specific Course
+      description: Updates a specific Course based on its id
+      operationId: course_update_post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Id of course to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/CourseBody"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/requestBodies/CourseBody"
+
+      responses:
+        201:
+          description: Course updated succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        400:
+          description: Invalid Input Fields
+        500:
+          description: Internal Server Error
+
+    delete:
+      tags:
+        - course
+      summary: Deletes a Course
+      description: Deletes a specific Course based on id
+      operationId: course_delete_post
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: id of course to delete
+          schema:
+            type: string
+
+      responses:
+        204:
+          description: Course deleted succesfully
+        500:
+          description: Internal Server Error
+
+  /goals:
+    get:
+      tags:
+        - goal
+      summary: Retrieves a list of Goals
+      description: Retrieves a list of goals as JSON objects.
+      operationId: goals_list
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Goal"
+        500:
+          description: Internal Server Error.
+
+    post:
+      tags:
+        - goal
+      summary: Create a new goal
+      description: Create a new goal
+      operationId: goal_create_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/GoalBody"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/requestBodies/GoalBody"
+
+      responses:
+        201:
+          description: Goal created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Goal"
+        400:
+          description: Invalid Input Fields
+        500:
+          description: Internal Server Error
+
+  /goals?sort:
+    get:
+      tags:
+        - goal
+      summary: Retrieves a list of Goals sorted by name
+      description: Retrieves a list of courses sorted by name as JSON objects.
+      operationId: courses_list
+      parameters:
+        - name: sort
+          in: query
+          description: Name value that need to be considered for sorting
+          required: true
+          exploded: true
+          schema:
+            type: string
+            default: name
+            enum:
+              - name
+              - -name
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Goal"
+        500:
+          description: Internal Server Error.
+
+  /goals/{id}:
+    get:
+      tags:
+        - goal
+      summary: Retrieves Goal by ID
+      description: Retrieves a single Goal as JSON objects.
+      operationId: goal_detail
+      parameters:
+        - name: id
+          in: path
+          description: Id of goal to get
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Goal"
+        500:
+          description: Internal Server Error.
+
+    put:
+      tags:
+        - goal
+      summary: Updates a specific Goal
+      description: Updates a specific Goal based on its id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Id of goal to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/GoalBody"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/requestBodies/GoalBody"
+
+      responses:
+        201:
+          description: Course updated succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        400:
+          description: Invalid Input Fields
+        500:
+          description: Internal Server Error
+
+    delete:
+      tags:
+        - goal
+      summary: Deletes a Goal
+      description: Deletes a specific Goal based on id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: id of goal to delete
+          schema:
+            type: string
+
+      responses:
+        204:
+          description: Course deleted succesfully
+        500:
+          description: Internal Server Error
+
+  /athenaeums:
+    get:
+      tags:
+        - athenaeum
+      summary: Retrieves a list of Athenaeums
+      description: Retrieves a list of athenaeums as JSON objects.
+      operationId: athenaeums_list
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Athenaeum"
+        500:
+          description: Internal Server Error.
+
+    post:
+      tags:
+        - athenaeum
+      summary: Create a new athenaeum
+      description: Create a new athenaeum
+      operationId: athenaeum_create_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AthenaeumBody"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/requestBodies/AthenaeumBody"
+
+      responses:
+        201:
+          description: Goal created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Athenaeum"
+        400:
+          description: Invalid Input Fields
+        500:
+          description: Internal Server Error
+
+  /athenaeums?sort:
+    get:
+      tags:
+        - athenaeum
+      summary: Retrieves a list of athenaeuma sorted by name
+      description: Retrieves a list of athenaeums sorted by name as JSON objects.
+      operationId: athenaeums_list
+      parameters:
+        - name: sort
+          in: query
+          description: Athenaeum value that need to be considered for sorting
+          required: true
+          exploded: true
+          schema:
+            type: string
+            default: name
+            enum:
+              - name
+              - -name
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Athenaeum"
+        500:
+          description: Internal Server Error.
+
+  /athenaeums/{id}:
+    get:
+      tags:
+        - athenaeum
+      summary: Retrieves Athenaeum by ID
+      description: Retrieves a single athenaeum as JSON objects.
+      operationId: athenaeum_detail
+      parameters:
+        - name: id
+          in: path
+          description: Id of athenaeum to get
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Athenaeum"
+        500:
+          description: Internal Server Error.
+
+    put:
+      tags:
+        - athenaeum
+      summary: Updates a specific athenaeum
+      description: Updates a specific athenaeum based on its id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Id of athenaeum to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/AthenaeumBody"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/requestBodies/AthenaeumBody"
+
+      responses:
+        201:
+          description: Course updated succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        400:
+          description: Invalid Input Fields
+        500:
+          description: Internal Server Error
+
+    delete:
+      tags:
+        - athenaeum
+      summary: Deletes a athenaeum
+      description: Deletes a specific athenaeum based on id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: id of athenaeum to delete
+          schema:
+            type: string
+
+      responses:
+        204:
+          description: Course deleted succesfully
+        500:
+          description: Internal Server Error
