@@ -14,6 +14,7 @@ const goals_list = async (query) => {
       return allGoals;
     }
 
+    // if query sort is defined, sort all goals by name in ascending or descending order
     const sortedGoals = await Goal.find({})
       .sort(query.sort)
       .populate({ path: "courses", select: "name" });

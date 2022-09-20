@@ -9,6 +9,7 @@ const athenaeumSchema = new Schema(
   { timestamps: true }
 );
 
+// When a course is created and it has an athenaeum in course.athenaeums find athenaeum ID and push course reference into athenaeum.courses
 athenaeumSchema.static(
   "addCourseRelation",
   async function (athenaeumID, course) {
@@ -20,6 +21,7 @@ athenaeumSchema.static(
   }
 );
 
+// When a course is deleted and it has an athenaeum in course.athenaeums find athenaeum ID and pull course reference from athenaeum.courses
 athenaeumSchema.static(
   "removeCourseRelation",
   async function (athenaeumID, course) {
@@ -31,18 +33,19 @@ athenaeumSchema.static(
   }
 );
 
-/**
- * Loop through existing athenaeums to add or remove course depending if there is a relation or not after changes
- * @param {object} oldCourse course before any update
- * @param {object} newCourse course after updates
- */
+/*
+When a course is updated, also athenaeums where it is held can be removed or added. This method goes through all athenaeum.courses and remove or add the course reference.
 
+Case 1: If goal id is specified in old course but NOT in updated course --> remove course reference from athenaeum.courses
+Case 2: If athenaeum id is NOT specified in old course but it is in new course --> add course reference to athenaeum.courses
+*/
 athenaeumSchema.static("updateCourses", async function (oldCourse, newCourse) {
   try {
     // Retrieve all athenaeums in database and select only courses arrays
     const coursesInAthenaeums = await this.find({}, "courses");
 
     coursesInAthenaeums.forEach(async (course) => {
+      // Case 1
       if (
         oldCourse.athenaeums.includes(course._id) &&
         !newCourse.athenaeums.includes(course._id)
@@ -52,6 +55,7 @@ athenaeumSchema.static("updateCourses", async function (oldCourse, newCourse) {
         });
       }
 
+      // Case 2
       if (
         !oldCourse.athenaeums.includes(course._id) &&
         newCourse.athenaeums.includes(course._id)

@@ -10,7 +10,7 @@ const courseSchema = new Schema(
   { timestamps: true }
 );
 
-// Similar to addCourseRelation on other models, this one also accept another parameter (elementType) which specifiecs whether the element to push is an athenaeum or a goal. This also allow to define in which array the element must be pushed
+// When a goal or athenaeum are created if they have a course reference inside courses array, find course and add the relation to goal and athenaeum
 courseSchema.static(
   "addRelations",
   async function (elementType, courseID, element) {
@@ -30,6 +30,7 @@ courseSchema.static(
   }
 );
 
+// When a goal or athenaeum are deleted if they have a course reference inside courses array, find course and remove the relation to goal and athenaeum
 courseSchema.static(
   "removeRelations",
   async function (elementType, courseID, element) {
@@ -49,12 +50,12 @@ courseSchema.static(
   }
 );
 
-/**
- * Loop through existing courses to add or remove goal depending if there is a relation or not after changes in goal.courses
- * @param {object} oldGoal goal before any update
- * @param {object} newGoal goal after updates
- */
+/*
+When a goal is updated, also courses that belong into it can be removed or added. This method goes through all course.goals and remove or add the goal reference.
 
+Case 1: If course id is specified in old goal but NOT in updated goal --> remove goal reference from course.goals
+Case 2: If course id is NOT specified in old goal but it is in new goal --> add goal reference to course.goals
+*/
 courseSchema.static("updateGoals", async function (oldGoal, newGoal) {
   try {
     const courses = await this.find({});
@@ -83,11 +84,12 @@ courseSchema.static("updateGoals", async function (oldGoal, newGoal) {
   }
 });
 
-/**
- * Loop through existing courses to add or remove goal depending if there is a relation or not after changes in athenaeum.courses
- * @param {object} oldGoal goal before any update
- * @param {object} newGoal goal after updates
- */
+/*
+When an athenaeum is updated, also courses that are held into it can be removed or added. This method goes through all course.athenaeums and remove or add the athenaeum reference.
+
+Case 1: If course id is specified in old athenaeum but NOT in updated athenaeum --> remove athenaeum reference from course.athenaeums
+Case 2: If course id is NOT specified in old athenaeum but it is in new athenaeum --> add athenaeum reference to course.athenaeums
+*/
 courseSchema.static(
   "updateAtheaneums",
   async function (oldAthenaeum, newAthenaeum) {

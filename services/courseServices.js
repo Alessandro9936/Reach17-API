@@ -6,7 +6,7 @@ const createError = require("http-errors");
 
 const course_list = async (query) => {
   try {
-    // Check if the query is empty, if it is get all courses
+    // Check if the query is empty, if it is get all courses and populate goals and athenaeums fields
     if (Object.keys(query).length === 0) {
       const allCourses = await Course.find()
         .populate({ path: "goals", select: "name" })
@@ -14,7 +14,7 @@ const course_list = async (query) => {
       return allCourses;
     }
 
-    // If query filter by name, find course with name
+    // If query filter by name, find course with name in query
     if (query.name) {
       const course = await Course.find({ name: query.name })
         .populate({ path: "goals", select: "name" })

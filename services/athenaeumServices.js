@@ -5,7 +5,7 @@ const createError = require("http-errors");
 
 const athenaeums_list = async (query) => {
   try {
-    // Check if the query is empty, if it is get all athenaeums
+    // Check if the query is empty, if it is get all athenaeums and populate course field
     if (Object.keys(query).length === 0) {
       const athenaeums = await Athenaeum.find().populate({
         path: "courses",
@@ -14,6 +14,7 @@ const athenaeums_list = async (query) => {
       return athenaeums;
     }
 
+    // if query sort is defined, sort all athenaeums by name in ascending or descending order
     const sortedAthenaeums = await Athenaeum.find({})
       .sort(query.sort)
       .populate({ path: "courses", select: "name" });

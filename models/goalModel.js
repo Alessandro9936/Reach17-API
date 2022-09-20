@@ -9,6 +9,7 @@ const goalSchema = new Schema(
   { timestamps: true }
 );
 
+// When a course is created and it has a goal in course.goals find goal ID and push course reference into goal.courses
 goalSchema.static("addCourseRelation", async function (goalID, course) {
   try {
     await this.findByIdAndUpdate(goalID, { $push: { courses: course } });
@@ -17,6 +18,7 @@ goalSchema.static("addCourseRelation", async function (goalID, course) {
   }
 });
 
+// When a course is deleted and it has a goal in course.goals find goal ID and pull course reference from goal.courses
 goalSchema.static("removeCourseRelation", async function (goalID, course) {
   try {
     await this.findByIdAndUpdate(goalID, { $pull: { courses: course } });
@@ -25,18 +27,19 @@ goalSchema.static("removeCourseRelation", async function (goalID, course) {
   }
 });
 
-/**
- * Loop through existing goals to add or remove course depending if there is a relation or not after changes
- * @param {object} oldCourse course before any update
- * @param {object} newCourse course after updates
- */
+/*
+When a course is updated, also goals that it belongs to can be removed or added. This method goes through all goal.courses and remove or add the course reference.
 
+Case 1: If goal id is specified in old course but NOT in updated course --> remove course reference from goal.courses
+Case 2: If goal id is NOT specified in old course but it is in new course --> add course reference to goal.courses
+*/
 goalSchema.static("updateCourses", async function (oldCourse, newCourse) {
   try {
     // Retrieve all goals in database and select only courses arrays
     const coursesInGoals = await this.find({}, "courses");
 
     coursesInGoals.forEach(async (course) => {
+      // Case 1
       if (
         oldCourse.goals.includes(course._id) &&
         !newCourse.goals.includes(course._id)
@@ -46,6 +49,7 @@ goalSchema.static("updateCourses", async function (oldCourse, newCourse) {
         });
       }
 
+      // Case 2
       if (
         !oldCourse.goals.includes(course._id) &&
         newCourse.goals.includes(course._id)
