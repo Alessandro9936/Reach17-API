@@ -27,13 +27,10 @@ if (process.env.NODE_ENV !== "test") {
 }
 
 // Import Routes
-
 const goalRoutes = require("./routes/goal");
 const courseRoutes = require("./routes/course");
 const athenaeumRoutes = require("./routes/athenaeum");
 const indexRoutes = require("./routes/index");
-
-// Initiate App Middlewares
 
 // Use gzip compression to decrease the size of the response body and increase speed of app
 app.use(compression());
@@ -69,7 +66,7 @@ app.use(
 
 // Handle error if the routes not found or there's problem in DB connection
 app.use((req, res, next) => {
-  next(createHTTPError(404, "Page Not Found"));
+  next(createHTTPError(404, "Resource Not Found"));
 });
 
 // Error handler
