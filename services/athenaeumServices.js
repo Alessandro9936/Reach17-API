@@ -7,11 +7,16 @@ const athenaeums_list = async (query) => {
   try {
     // Check if the query is empty, if it is get all athenaeums
     if (Object.keys(query).length === 0) {
-      const athenaeums = await Athenaeum.find();
+      const athenaeums = await Athenaeum.find().populate({
+        path: "courses",
+        select: "name",
+      });
       return athenaeums;
     }
 
-    const sortedAthenaeums = await Athenaeum.find({}).sort(query.sort);
+    const sortedAthenaeums = await Athenaeum.find({})
+      .sort(query.sort)
+      .populate({ path: "courses", select: "name" });
     return sortedAthenaeums;
   } catch (error) {
     throw createError(500, error);

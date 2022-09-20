@@ -7,11 +7,16 @@ const goals_list = async (query) => {
   try {
     // Check if the query is empty, if it is get all athenaeums
     if (Object.keys(query).length === 0) {
-      const allGoals = await Goal.find();
+      const allGoals = await Goal.find().populate({
+        path: "courses",
+        select: "name",
+      });
       return allGoals;
     }
 
-    const sortedGoals = await Goal.find({}).sort(query.sort);
+    const sortedGoals = await Goal.find({})
+      .sort(query.sort)
+      .populate({ path: "courses", select: "name" });
     return sortedGoals;
   } catch (error) {
     throw createError(500, error);
