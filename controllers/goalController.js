@@ -28,8 +28,12 @@ exports.goal_update_post = async (req, res, next) => {
 };
 
 exports.goal_delete_post = async (req, res, next) => {
-  const deletedGoal = await goalServices.goal_delete_post(req);
-  res.status(204).end();
+  try {
+    await goalServices.goal_delete_post(req);
+    res.status(204).end();
+  } catch (err) {
+    return next(err);
+  }
 };
 
 exports.goal_detail = async (req, res, next) => {
