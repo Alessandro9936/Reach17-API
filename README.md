@@ -1,4 +1,4 @@
-# S2I_NodeJS
+# Reach17 RESTful API
 This is the final project for the renowned italian learning platform Start2Impact - NodeJS section
 
 ## About the project
