@@ -2,8 +2,7 @@
 This is the final project for the renowned italian learning platform Start2Impact - NodeJS section
 
 ## About the project
-The requirement of this project was to create a RESTful API for a ONU goal-based training platform that need to catalog the courses they will offer. The main purpose of this API is to create, read, update and delete these courses.
-
+Reach17 is a training platform based on UN goals that focuses on creating university courses. Using this RESTful API, courses can be cataloged based on the UN goal and the referring university.
 ## Technologies
 - Express 4.18.1
 - MongoDB (ODM: Mongoose 6.5.3)
